@@ -1,0 +1,49 @@
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
+
+<script language="javascript1.2" src="js/codethatcalendarstd.js"></script>
+<tr>
+	<td>Select Zone</td>
+	<td><html:radio property="selectZone" title="Selection" value="S"
+		styleId="selectZone">
+					Selection</html:radio> <html:radio property="selectZone" title="All" value="A"
+		styleId="selectZone">
+					All</html:radio></td>
+	<td><html:select property="zoneId" styleId="zoneId"
+		style="width: 255px" styleClass="ci5"
+		onchange="ajaxFunction('GetFilterValues.to?zoneId='+this.value, 'circleId');
+					triggerEvent(document.getElementById('circleId'), 'onchange');">
+		<html:option value="">Select Zone</html:option>
+		<html:options collection="zones" labelProperty="label"
+			property="value"></html:options>
+	</html:select></td>
+</tr>
+<tr>
+	<td>Select Circle</td>
+	<td><html:radio property="selectCircle" title="Selection"
+		value="S" styleId="selectCircle">
+					Selection</html:radio> <html:radio property="selectCircle" title="All" value="A"
+		styleId="selectCircle">
+					All</html:radio></td>
+	<td><html:select property="circleId" styleId="circleId"
+		style="width: 255px" styleClass="ci5"
+		onchange="ajaxFunction('GetFilterValues.to?circleId='+this.value, 'districtId');">
+	</html:select></td>
+</tr>
+<tr>
+	<td>Select District</td>
+	<td><html:radio property="selectDistrict" title="Selection"
+		value="S" styleId="selectDistrict">
+					Selection</html:radio> <html:radio property="selectDistrict" title="All"
+		value="A" styleId="selectDistrict">
+					All</html:radio></td>
+	<td><html:select property="districtId" styleId="districtId"
+		style="width: 255px" styleClass="ci5">
+
+	</html:select></td>
+</tr>
+
+<SCRIPT LANGUAGE="JavaScript">
+				triggerEvent(document.getElementById('zoneId'), 'onchange');
+			 </script>
+

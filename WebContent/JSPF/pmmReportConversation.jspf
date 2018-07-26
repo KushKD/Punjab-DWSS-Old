@@ -1,0 +1,119 @@
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
+
+<!--<script language="javascript1.2" src="js/codethatcalendarstd.js"></script>	
+			-->
+<tr id='zone_s'>
+	<td>Select Zone</td>
+	<td><html:radio property="selectZone" title="Selection" value="S"
+			styleId="zoneSelection">
+					Selection</html:radio> <html:radio property="selectZone" title="All" value="A"
+			styleId="zoneAll">
+					All</html:radio></td>
+	<td colspan="2"><html:select property="zoneId" styleId="zoneId"
+			style="width: 255px" styleClass="ci5"
+			onchange="ajaxFunction('GetFilterValues.to?zoneId='+this.value, 'circleId');
+					triggerEvent(document.getElementById('circleId'), 'onchange');selectRadioZone();">
+			<html:option value="">Select Zone</html:option>
+			<html:options collection="zones" labelProperty="label"
+				property="value"></html:options>
+		</html:select></td>
+</tr>
+<tr id=circle_s>
+	<td>Select Circle</td>
+	<td><html:radio property="selectCircle" title="Selection"
+			value="S" styleId="circleSelection">
+					Selection</html:radio> <html:radio property="selectCircle" title="All" value="A"
+			styleId="circleAll">
+					All</html:radio></td>
+	<td colspan="2"><html:select property="circleId"
+			styleId="circleId" style="width: 255px" styleClass="ci5"
+			onchange="ajaxFunction('GetFilterValues.to?circleId='+this.value, 'districtId');selectRadioCircle();setCircleName()">
+
+		</html:select></td>
+</tr>
+<tr id='district_s'>
+	<td>Select District</td>
+	<td><html:radio property="selectDistrict" title="Selection"
+			value="S" styleId="districtSelection">
+					Selection</html:radio> <html:radio property="selectDistrict" title="All"
+			value="A" styleId="districtAll">
+					All</html:radio></td>
+	<td colspan="2"><html:select property="districtId"
+			styleId="districtId" style="width: 255px" styleClass="ci5"
+			onchange="ajaxFunction('GetFilterValues.to?districtId11='+this.value, 'division'); selectRadioDistrict();
+		   
+		   if(this.value===''){
+			document.getElementById('division').value='';
+			document.getElementById('survey').style.display ='none';
+		}
+		if(this.value!=''){
+			document.getElementById('survey').style.display ='';
+		}
+			
+				
+		
+		
+		">
+
+		</html:select></td>
+</tr>
+
+
+<!--<tr>
+				<td>Approval Status</td>
+				<td colspan="3">
+					<html:radio property="approvalStatus" title="Pending" value="U">Pending&nbsp;&nbsp;</html:radio>
+					<html:radio property="approvalStatus" title="Approved" value="A">Approved</html:radio>
+					<html:radio property="approvalStatus" title="All" value="UA">All</html:radio>
+				</td>
+			</tr>-->
+
+
+<br>
+<SCRIPT LANGUAGE="JavaScript">
+	triggerEvent(document.getElementById('zoneId'), 'onchange');
+</script>
+<script>
+	function setCircleName() {
+		if ($("#circleId").val() != "") {
+			var ss = $("#circleId option:selected").text();
+			document.getElementById("circleName").value = ss;
+		}else{
+			document.getElementById("circleName").value="All";
+		}
+	}
+	function selectRadioZone() {
+
+		var zone = document.getElementById('zoneId').value;
+		if (zone != "") {
+			document.getElementById('zoneSelection').checked = true;
+		} else {
+			document.getElementById('zoneAll').checked = true;
+			document.getElementById('circleAll').checked = true;
+			document.getElementById('districtAll').checked = true;
+		}
+	}
+
+	function selectRadioCircle() {
+
+		var circle = document.getElementById('circleId').value;
+		if (circle != "") {
+			document.getElementById('circleSelection').checked = true;
+		} else {
+			document.getElementById('circleAll').checked = true;
+			document.getElementById('districtAll').checked = true;
+		}
+	}
+
+	function selectRadioDistrict() {
+
+		var district = document.getElementById('districtId').value;
+		if (district != "") {
+			document.getElementById('districtSelection').checked = true;
+		} else {
+			document.getElementById('districtAll').checked = true;
+		}
+	}
+</script>
+

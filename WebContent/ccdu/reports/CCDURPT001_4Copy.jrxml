@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CCDURPT001_6" language="groovy" pageWidth="504" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="464" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="queryString" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1=1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1=1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1=1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from" class="java.lang.String">
+		<defaultValueExpression><![CDATA["01-04-2008"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to" class="java.lang.String">
+		<defaultValueExpression><![CDATA["31-03-2011"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  tr_level,case when tr_level=1 then 'District Level'
+	     when tr_level=2 then 'Block Level'
+	     when tr_level=3 then 'Village Level' end as training_level,training_name,count(training_name) as cnt,sum(total_participants)
+from
+(select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,village_name,divisional_office_id,nc_pc_status,phase_village,training_name,date_of_training,
+	total_participants,decision_taken,action_by_when,outcome,cast(prog_id as text),issues_emerged_during_training,expenditure,households,population,scheme_funded_by,
+	training_officer,tr_level
+from
+(select  zone_id,zone_name,circle_id,circle_name,district_id,district_name,null block,null as village_name,null divisional_office_id,null nc_pc_status,null phase_village,
+	training_name,date_of_training,sum(total_participants) total_participants,decision_taken,action_by_when,
+	outcome,array_agg(prog_id) prog_id,issues_emerged_during_training,sum(expenditure) expenditure,null households,
+	null population,null scheme_funded_by,cast(training_officer as character varying)training_officer,tr_level
+from
+(select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,1 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='District Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)x
+group by zone_id,zone_name,circle_id,circle_name,district_id,district_name,training_name,date_of_training,decision_taken,issues_emerged_during_training,action_by_when,
+	training_officer,outcome,tr_level
+
+union all
+
+select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,cast(array_agg(village_name) as character varying) as village_name,divisional_office_id,
+	cast(array_agg(nc_pc_status) as character varying) nc_pc_status,cast(array_agg(phase_village)  as character varying),training_name,date_of_training,
+	sum(total_participants) total_participants,cast(array_agg(decision_taken) as character varying) decision_taken,action_by_when,cast(array_agg(outcome) as character varying) outcome,
+	array_agg(prog_id) prog_id,cast(array_agg(issues_emerged_during_training) as character varying) issues_emerged_during_training,sum(expenditure) expenditure,
+	sum(households) households,sum(population) population,'' scheme_funded_by,replace(cast(array_agg(cast(training_officer as character varying)) as character varying),'NULL','') training_officer,tr_level
+from
+(select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,2 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='Block Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)xx
+group by zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,training_name,date_of_training,divisional_office_id,action_by_when,tr_level)dib_blk
+
+
+union all
+
+select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,village_name,divisional_office_id,nc_pc_status,phase_village,training_name,date_of_training,
+	total_participants,decision_taken,action_by_when,outcome,prog_id,issues_emerged_during_training,expenditure,households,population,scheme_funded_by,
+	cast(training_officer as character varying) training_officer,tr_level
+from (select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,3 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='Village Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)xxx) final
+where $P!{where}
+group by tr_level,training_level,training_name
+order  by tr_level]]>
+	</queryString>
+	<field name="tr_level" class="java.lang.Integer"/>
+	<field name="training_level" class="java.lang.String"/>
+	<field name="training_name" class="java.lang.String"/>
+	<field name="cnt" class="java.lang.Long"/>
+	<field name="sum" class="java.math.BigDecimal"/>
+	<variable name="cnt_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cnt}]]></variableExpression>
+	</variable>
+	<variable name="sum_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{sum}]]></variableExpression>
+	</variable>
+	<variable name="cnt_2" class="java.lang.Long" resetType="Group" resetGroup="level_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{cnt}]]></variableExpression>
+	</variable>
+	<variable name="sum_2" class="java.math.BigDecimal" resetType="Group" resetGroup="level_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{sum}]]></variableExpression>
+	</variable>
+	<group name="level_grp">
+		<groupExpression><![CDATA[$F{training_level}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement style="table_TD" mode="Opaque" x="48" y="0" width="365" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{training_level}+" Training:"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="25">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="184" y="0" width="129" height="25" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Long"><![CDATA[$V{cnt_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="313" y="0" width="100" height="25" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sum_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="48" y="0" width="136" height="25" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{training_level}+"\n"+"Total:"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="39" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="184" y="0" width="129" height="27" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="48" y="0" width="136" height="27" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name of Training]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="313" y="0" width="100" height="27" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of Participants]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="48" y="27" width="136" height="12" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="184" y="27" width="129" height="12" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="313" y="27" width="100" height="12" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="48" y="0" width="136" height="28" backcolor="#FFFFFF"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{training_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="184" y="0" width="129" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cnt}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="313" y="0" width="100" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sum}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="184" y="0" width="129" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$V{cnt_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="313" y="0" width="100" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sum_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="48" y="0" width="136" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

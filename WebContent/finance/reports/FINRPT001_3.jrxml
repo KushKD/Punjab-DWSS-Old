@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="finrpt001_3" language="groovy" pageWidth="720" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="680" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1=1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fincode" class="java.lang.String">
+		<defaultValueExpression><![CDATA["5"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select spmc_dpmc,main_component,unit,sum(physical_quantity)physical_quantity,sum(actual_bdgt)actual_bdgt,
+	'' as total_provision,'' as total_fund,prwss_main.get_fin_year_code($P{fincode}) fin_year,
+	prwss_main.get_pre_fin_year_code($P{fincode})pre_fin_year
+from
+(select   * from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name,divisional_name,di.is_spmc_dpmc as spmc_dpmc,xx.main_component,xx.unit,xx.physical_quantity,xx.actual_bdgt
+
+from
+(select vb.location_id,sub_component_name as main_component,activity_name as unit,physical_quantity,actual_bdgt
+from
+(select voc.*,physical_quantity from
+(select vh.location_id,sub_component_id,activity_id,vd.amount/100000 as actual_bdgt
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id
+and   component_id='com1' and vh.status<>'D' and vd.status<>'D'
+and   voc_date between prwss_main.get_pre_fin_year_start_date($P{fincode}) and prwss_main.get_pre_fin_year_end_date($P{fincode})) voc
+left join
+(select location_id,est_physical_budgt as physical_quantity,activity_id from prwss_main.t_finance_budget_hdr a, prwss_main.t_finance_budget_detail b
+	where a.budget_id=b.budget_id and a.status<>'D' and b.status<>'D'
+	and  budget_from_date>= prwss_main.get_fin_year_start_date($P{fincode}) and budget_to_date<= prwss_main.get_fin_year_end_date($P{fincode})) bd
+on voc.activity_id=bd.activity_id
+and  voc.location_id=bd.location_id) vb,prwss_main.mst_sub_component msc,prwss_main.mst_activity ma
+where vb.sub_component_id=msc.sub_component_id
+and   vb.activity_id=ma.activity_id
+and   msc.status<>'D' and ma.status<>'D') xx,
+
+prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where xx.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id) xxx
+where spmc_dpmc in ('DPMC','SPMC')) main
+where $P!{where}
+group by spmc_dpmc,main_component,unit
+order by spmc_dpmc desc,main_component]]>
+	</queryString>
+	<field name="spmc_dpmc" class="java.lang.String"/>
+	<field name="main_component" class="java.lang.String"/>
+	<field name="unit" class="java.lang.String"/>
+	<field name="physical_quantity" class="java.math.BigDecimal"/>
+	<field name="actual_bdgt" class="java.math.BigDecimal"/>
+	<field name="total_provision" class="java.lang.String"/>
+	<field name="total_fund" class="java.lang.String"/>
+	<field name="fin_year" class="java.lang.String"/>
+	<field name="pre_fin_year" class="java.lang.String"/>
+	<variable name="physical_quantity_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{physical_quantity}]]></variableExpression>
+	</variable>
+	<variable name="actual_bdgt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{actual_bdgt}]]></variableExpression>
+	</variable>
+	<variable name="unit_1" class="java.lang.Integer" resetType="Group" resetGroup="spmc_dpmc_grp" calculation="Count">
+		<variableExpression><![CDATA[$F{unit}]]></variableExpression>
+	</variable>
+	<variable name="physical_quantity_1" class="java.math.BigDecimal" resetType="Group" resetGroup="spmc_dpmc_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{physical_quantity}]]></variableExpression>
+	</variable>
+	<variable name="actual_bdgt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="spmc_dpmc_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{actual_bdgt}]]></variableExpression>
+	</variable>
+	<variable name="physical_quantity_3" class="java.math.BigDecimal" resetType="Group" resetGroup="unit_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{physical_quantity}]]></variableExpression>
+	</variable>
+	<variable name="actual_bdgt_3" class="java.math.BigDecimal" resetType="Group" resetGroup="unit_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{actual_bdgt}]]></variableExpression>
+	</variable>
+	<variable name="total_provision_1" class="java.lang.Integer" resetType="Group" resetGroup="unit_grp" calculation="Count">
+		<variableExpression><![CDATA[$F{total_provision}]]></variableExpression>
+	</variable>
+	<variable name="physical_quantity_4" class="java.math.BigDecimal" resetType="Group" resetGroup="main_comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{physical_quantity}]]></variableExpression>
+	</variable>
+	<variable name="actual_bdgt_4" class="java.math.BigDecimal" resetType="Group" resetGroup="main_comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{actual_bdgt}]]></variableExpression>
+	</variable>
+	<group name="spmc_dpmc_grp">
+		<groupExpression><![CDATA[$F{spmc_dpmc}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="630" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{spmc_dpmc}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="338" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<textField pattern="###0.00;###0.00-" isBlankWhenNull="true">
+					<reportElement style="table_TD" mode="Opaque" x="363" y="0" width="135" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<box leftPadding="4"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{actual_bdgt_1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="498" y="0" width="157" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="main_comp_grp">
+		<groupExpression><![CDATA[$F{main_component}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="630" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{main_component}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="20">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="338" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{main_component}+" Total:"]]></textFieldExpression>
+				</textField>
+				<textField pattern="###0.00;###0.00-" isBlankWhenNull="true">
+					<reportElement style="table_TD" mode="Opaque" x="363" y="0" width="135" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{actual_bdgt_4}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="498" y="0" width="157" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="unit_grp">
+		<groupExpression><![CDATA[$F{unit}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="60" y="0" width="303" height="20" backcolor="#FFFFCC"/>
+					<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="2"/>
+					<textElement/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{unit}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="unit_grp" pattern="###0.00;###0.00-" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="363" y="0" width="135" height="20" backcolor="#FFFFCC"/>
+					<box leftPadding="4"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{actual_bdgt_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="498" y="0" width="157" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{total_fund}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="table_TH" x="25" y="0" width="35" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="77" splitType="Stretch">
+			<staticText>
+				<reportElement x="25" y="0" width="630" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation, Punjab]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="21" width="217" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Website: www.pbdwss.gov.in]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="46" width="357" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Budget Approved by SWSM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="527" y="26" width="128" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Finance Report A.3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="483" y="46" width="100" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Financial Year:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="583" y="46" width="72" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fin_year}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="99" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="60" y="63" width="303" height="20" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Activity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="363" y="20" width="135" height="43" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Actual ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="498" y="20" width="157" height="43" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Fund Required during ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="60" y="20" width="303" height="43" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Program Management Sub-Components]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="60" y="0" width="595" height="20" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMPONENT (A) -  Program Management Costs :- (Rs. in Lacs)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="26" y="83" width="34" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[1	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="363" y="83" width="136" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="499" y="83" width="156" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="364" y="63" width="136" height="20" forecolor="#000000" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{pre_fin_year}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="500" y="63" width="156" height="20" forecolor="#000000" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fin_year}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TH" x="26" y="0" width="34" height="83" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sr. No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="60" y="83" width="303" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="556" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="65" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="25" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="289" y="0" width="128" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Finance Report: A.3]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="###0.00;###0.00-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="363" y="0" width="135" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<box leftPadding="4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{actual_bdgt_2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="498" y="0" width="157" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="338" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="finrpt001_13" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="fincode" class="java.lang.String">
+		<defaultValueExpression><![CDATA["5"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="qtr" class="java.lang.String">
+		<defaultValueExpression><![CDATA["q1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA[" 1=1 "]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from (select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name,divisional_name,
+prwss_main.get_fin_qtr_code('$P!{fincode}'||'$P!{qtr}')qtr,prwss_main.get_fin_year_code('$P!{fincode}') finyear,prwss_main.get_fin_qtr_end_date('$P!{fincode}$P!{qtr}') qtr_end_date,
+xxx.*
+from
+(
+select  location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,COALESCE(qtd_expend,0)qtd_expend,COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'A' as component,'Program Management'as activity,'1'as category,100 as Reibursement_per,0 as inelegible_expenditure,
+
+        sum(case when component_id='com1' and  voc_date between  prwss_main.get_fin_qtr_start_date('$P!{fincode}'||'$P!{qtr}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as qtd_expend,
+        sum(case when component_id='com1' and  voc_date between  prwss_main.get_fin_year_start_date('$P!{fincode}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure) x) xx
+
+union
+
+select  location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,
+COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,
+COALESCE(qtd_expend,0)qtd_expend,
+COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'B' as component,'Community Development'as activity,'1'as category,100 as Reibursement_per,0 as inelegible_expenditure,
+
+        sum(case when component_id='com2' and  voc_date between  prwss_main.get_fin_qtr_start_date('$P!{fincode}'||'$P!{qtr}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as qtd_expend,
+        sum(case when component_id='com2' and  voc_date between  prwss_main.get_fin_year_start_date('$P!{fincode}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure)y)yy
+
+union
+
+select  distinct location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,
+COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,
+COALESCE(qtd_expend,0)qtd_expend,
+COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'C1 & C2(a)' as component,'Infrastructure Development (World Bank Supported schemes) - Grant in Aid to GPWSC for SVs & Intra Village works-Expenditure by DWSS Divisions on Multi village scheme'as activity,
+         '2'as category,8$P!{fincode} as Reibursement_per,0 as inelegible_expenditure,
+
+        sum(case when component_id='com3' and sub_component_id='scom11' and  voc_date between  prwss_main.get_fin_qtr_start_date('$P!{fincode}'||'$P!{qtr}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as qtd_expend,
+        sum(case when component_id='com3' and sub_component_id='scom11' and  voc_date between  prwss_main.get_fin_year_start_date('$P!{fincode}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure)z)zz
+
+/*union
+
+select  location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,
+COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,
+COALESCE(qtd_expend,0)qtd_expend,
+COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'C2(b) & C3' as component,'First five Pilot Shemes'as activity,
+         '3(i)'as category,8$P!{fincode} as Reibursement_per,0 as inelegible_expenditure,
+
+        0 as qtd_expend,
+        0 as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure)a)aa
+*/
+union
+
+select  location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,
+COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,
+COALESCE(qtd_expend,0)qtd_expend,
+COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'C2(b)' as component,'First five Pilot Shemes for innovative water treatment'as activity,
+         '3(ii)'as category,8$P!{fincode} as Reibursement_per,0 as inelegible_expenditure,
+
+        sum(case when component_id='com3' and sub_component_id in ('scom12') and  voc_date between  prwss_main.get_fin_qtr_start_date('$P!{fincode}'||'$P!{qtr}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as qtd_expend,
+        sum(case when component_id='com3' and sub_component_id in ('scom12') and  voc_date between  prwss_main.get_fin_year_start_date('$P!{fincode}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure)b)bb
+
+union
+
+select  location_id,component,activity,category,qtd_expend,inelegible_expenditure_qtd,(qtd_expend-inelegible_expenditure_qtd) as eligible_expend_qtd,
+	Reibursement_per_qtd||'%' Reibursement_per_qtd,((qtd_expend-inelegible_expenditure_qtd)*Reibursement_per_qtd/100) as Reibursement_amnt_qtd,
+	ytd_expend,inelegible_expenditure_ytd,(ytd_expend-inelegible_expenditure_ytd) as eligible_expend_ytd,Reibursement_per_ytd||'%' Reibursement_per_ytd,
+	((ytd_expend-inelegible_expenditure_ytd)*Reibursement_per_ytd/100) as Reibursement_amnt_ytd
+from
+(select location_id,component,activity,category,COALESCE(Reibursement_per,0) as Reibursement_per_qtd,
+COALESCE(Reibursement_per,0) as Reibursement_per_ytd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_qtd,
+COALESCE(inelegible_expenditure,0) as inelegible_expenditure_ytd,
+COALESCE(qtd_expend,0)qtd_expend,
+COALESCE(ytd_expend,0)ytd_expend
+from
+(select  location_id,
+         'C3' as component,'First five Pilot Schemes for Community Sanitation'as activity,
+         '3(iii)'as category,8$P!{fincode} as Reibursement_per,0 as inelegible_expenditure,
+
+        sum(case when component_id='com3' and sub_component_id in ('scom13') and  voc_date between prwss_main.get_fin_qtr_start_date('$P!{fincode}'||'$P!{qtr}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as qtd_expend,
+        sum(case when component_id='com3' and sub_component_id in ('scom13') and  voc_date between prwss_main.get_fin_year_start_date('$P!{fincode}') and  prwss_main.get_fin_qtr_end_date('$P!{fincode}'||'$P!{qtr}') then vd.amount/100000 else 0 end) as ytd_expend
+
+from prwss_main.t_finance_voucher_hdr vh,prwss_main.t_finance_voucher_detail vd
+where vh.voc_id=vd.voc_id and vh.status<>'D' and vd.status<>'D' and vh.voc_type='PAYMENT'
+group by location_id,component,activity,category,Reibursement_per,inelegible_expenditure)c)cc
+) xxx,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where xxx.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+and   (divisional_name like '%DPMC%' or divisional_name like '%SPMC%')
+order by category,component)main
+where $P!{where}
+order by category,component]]>
+	</queryString>
+	<field name="zone_id" class="java.lang.String"/>
+	<field name="zone_name" class="java.lang.String"/>
+	<field name="circle_id" class="java.lang.String"/>
+	<field name="circle_name" class="java.lang.String"/>
+	<field name="district_id" class="java.lang.String"/>
+	<field name="district_name" class="java.lang.String"/>
+	<field name="divisional_name" class="java.lang.String"/>
+	<field name="qtr" class="java.lang.String"/>
+	<field name="finyear" class="java.lang.String"/>
+	<field name="qtr_end_date" class="java.sql.Date"/>
+	<field name="location_id" class="java.lang.String"/>
+	<field name="component" class="java.lang.String"/>
+	<field name="activity" class="java.lang.String"/>
+	<field name="category" class="java.lang.String"/>
+	<field name="qtd_expend" class="java.math.BigDecimal"/>
+	<field name="inelegible_expenditure_qtd" class="java.lang.Integer"/>
+	<field name="eligible_expend_qtd" class="java.math.BigDecimal"/>
+	<field name="reibursement_per_qtd" class="java.lang.String"/>
+	<field name="reibursement_amnt_qtd" class="java.math.BigDecimal"/>
+	<field name="ytd_expend" class="java.math.BigDecimal"/>
+	<field name="inelegible_expenditure_ytd" class="java.lang.Integer"/>
+	<field name="eligible_expend_ytd" class="java.math.BigDecimal"/>
+	<field name="reibursement_per_ytd" class="java.lang.String"/>
+	<field name="reibursement_amnt_ytd" class="java.math.BigDecimal"/>
+	<variable name="qtd_expend_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{qtd_expend}]]></variableExpression>
+	</variable>
+	<variable name="inelegible_expenditure_qtd_2" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{inelegible_expenditure_qtd}]]></variableExpression>
+	</variable>
+	<variable name="eligible_expend_qtd_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{eligible_expend_qtd}]]></variableExpression>
+	</variable>
+	<variable name="reibursement_amnt_qtd_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{reibursement_amnt_qtd}]]></variableExpression>
+	</variable>
+	<variable name="ytd_expend_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ytd_expend}]]></variableExpression>
+	</variable>
+	<variable name="inelegible_expenditure_ytd_2" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{inelegible_expenditure_ytd}]]></variableExpression>
+	</variable>
+	<variable name="eligible_expend_ytd_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{eligible_expend_ytd}]]></variableExpression>
+	</variable>
+	<variable name="reibursement_amnt_ytd_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{reibursement_amnt_ytd}]]></variableExpression>
+	</variable>
+	<variable name="qtd_expend_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{qtd_expend}]]></variableExpression>
+	</variable>
+	<variable name="inelegible_expenditure_qtd_3" class="java.lang.Integer" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{inelegible_expenditure_qtd}]]></variableExpression>
+	</variable>
+	<variable name="eligible_expend_qtd_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{eligible_expend_qtd}]]></variableExpression>
+	</variable>
+	<variable name="reibursement_amnt_qtd_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{reibursement_amnt_qtd}]]></variableExpression>
+	</variable>
+	<variable name="ytd_expend_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{ytd_expend}]]></variableExpression>
+	</variable>
+	<variable name="inelegible_expenditure_ytd_3" class="java.lang.Integer" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{inelegible_expenditure_ytd}]]></variableExpression>
+	</variable>
+	<variable name="eligible_expend_ytd_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{eligible_expend_ytd}]]></variableExpression>
+	</variable>
+	<variable name="reibursement_amnt_ytd_3" class="java.math.BigDecimal" resetType="Group" resetGroup="comp_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{reibursement_amnt_ytd}]]></variableExpression>
+	</variable>
+	<group name="comp_grp">
+		<groupExpression><![CDATA[$F{component}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="91" height="20" forecolor="#000000" backcolor="#FAF6F6"/>
+					<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{component}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="91" y="0" width="105" height="20" forecolor="#000000" backcolor="#FAF6F6"/>
+					<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{activity}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="196" y="0" width="36" height="20" forecolor="#000000" backcolor="#FAF6F6"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{category}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="232" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{qtd_expend_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="292" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{inelegible_expenditure_qtd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="352" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{eligible_expend_qtd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="472" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{reibursement_amnt_qtd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="532" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{ytd_expend_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="592" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{inelegible_expenditure_ytd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="652" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{eligible_expend_ytd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Group" evaluationGroup="comp_grp" pattern="###0.00;###0.00-">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="772" y="0" width="60" height="20" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{reibursement_amnt_ytd_3}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0.00;###0.00-" isBlankWhenNull="false">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="412" y="0" width="60" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{reibursement_per_qtd}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="###0.00;###0.00-" isBlankWhenNull="false">
+					<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="712" y="0" width="60" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{reibursement_per_ytd}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="73" splitType="Stretch">
+			<staticText>
+				<reportElement x="217" y="21" width="364" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Website: www.pbdwss.gov.in]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="832" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation, Punjab]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="21" width="152" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Finance Report E.1.1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="617" y="49" width="62" height="21"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[For F.Y.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="26" width="144" height="21"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ IUFR-I (Page 1)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="49" width="461" height="21"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Financial Report on Expenditure Incurred for the Quarter Ended:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="679" y="49" width="100" height="20"/>
+				<box leftPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{finyear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy">
+				<reportElement x="462" y="49" width="100" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{qtr_end_date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="117" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="232" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Expenditure(As per Books of Account)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="292" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ineligible expenditure (If any)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="352" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Eligible Expenditure]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="412" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reimbursement %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="472" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reimbursable Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="532" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Expenditure(As per Books of Account)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="592" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ineligible expenditure (If any)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="652" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Eligible Expenditure]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="712" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reimbursement %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="772" y="24" width="60" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reimbursable Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="0" y="0" width="91" height="101" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Component]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="91" y="0" width="105" height="101" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Activity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="196" y="0" width="36" height="101" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Category]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="table_TH" x="232" y="0" width="300" height="24" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["For the "+$F{qtr}+"    (Rs. in Lacs)"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TH" x="532" y="0" width="300" height="24" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["For the Year "+$F{finyear}+" (YTD)"+"  (Rs. in Lacs)"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TH" x="472" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="0" y="101" width="91" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="352" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="532" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[9]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="91" y="101" width="105" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="292" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="412" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="592" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="196" y="101" width="36" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="232" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="712" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="652" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="772" y="101" width="60" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[13]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="708" y="0" width="124" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="81" y="0" width="38" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="331" y="0" width="152" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Finance Report E.1.1]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="232" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{qtd_expend_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="292" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{inelegible_expenditure_qtd_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="352" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{eligible_expend_qtd_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="472" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{reibursement_amnt_qtd_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="532" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{ytd_expend_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="592" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{inelegible_expenditure_ytd_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="652" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{eligible_expend_ytd_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;(###0.00)">
+				<reportElement style="table_TD" x="772" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{reibursement_amnt_ytd_2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TD" x="0" y="0" width="232" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" x="412" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" x="712" y="0" width="60" height="20" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,28 @@
+
+<table class="form2">
+	<tr class="form2TH">
+		<td><label>Select Location</label></td>
+		<td><html:select property="locationId" styleId="locationId"
+			styleClass="cs2"
+			onchange="ajaxFunction('GetFilterValues.to?locationId='+this.value, 'blockId');triggerEvent(document.getElementById('blockId'), 'onchange');">
+			<html:option value="">Select Location</html:option>
+			<html:options collection="userLocations" labelProperty="label"
+				property="value" />
+		</html:select></td>
+
+		<td><label>Select Block</label></td>
+		<td><html:select property="blockId" styleId="blockId"
+			styleClass="cs2"
+			onchange="ajaxFunction('GetFilterValues.to?blockId='+this.value, 'villageId');">
+		</html:select></td>
+
+		<td><label>Select Village</label></td>
+		<td><html:select property="villageId" styleId="villageId"
+			styleClass="cs2">
+		</html:select></td>
+	</tr>
+</table>
+<script LANGUAGE="JavaScript">
+triggerEvent(document.getElementById('locationId'), 'onchange');
+triggerEvent(document.getElementById('blockId'), 'onchange');
+</script>

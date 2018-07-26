@@ -1,0 +1,32 @@
+
+<tr class="form2TH">
+	<td><label>Select Project</label></td>
+	<td><html:select property="projectId" styleId="projectId"
+		styleClass="cs1"
+		onchange="ajaxFunction('GetFilterValues.to?locationId='+this.value, 'blockId');triggerEvent(document.getElementById('blockId'), 'onchange');">
+		<html:options collection="projectIds" labelProperty="label"
+			property="value" />
+	</html:select></td>
+</tr>
+<tr class="form2TH">
+	<td><label>Select Location</label></td>
+	<td><html:select property="locationId" styleId="locationId"
+		styleClass="ci5"
+		onchange="ajaxFunction('GetFilterValues.to?blockId='+this.value, 'villageId');">
+		<html:option collection="projectIds" labelProperty="label"
+			property="value"></html:option>
+	</html:select></td>
+</tr>
+<tr class="form2TH">
+	<td><label>Select Budget Year</label></td>
+	<td><html:select property="budgetYear" styleId="budgetYear"
+		styleClass="ci5">
+		<html:option value="Select Budget year"></html:option>
+	</html:select></td>
+</tr>
+
+<SCRIPT LANGUAGE="JavaScript">
+triggerEvent(document.getElementById('projectId'), 'onchange');
+triggerEvent(document.getElementById('locationId'), 'onchange');
+triggerEvent(document.getElementById('budgetYear'), 'onchange');
+</script>

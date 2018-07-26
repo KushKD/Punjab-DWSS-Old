@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CCDURPT001_1" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="5">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="queryString" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA[" 1=1 "]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from
+(SELECT d.location_name as block,d.location_id as block_id ,c.location_name as district,c.location_id as district_id,b.location_name as circle,b.location_id as circle_id,
+a.location_name as zone,a.location_id as zone_id,
+e.cnt,e.colHdr,seq,e.training_name,e.plan_id,f.from_date,f.to_date
+from prwss_main.mst_location_master a,
+prwss_main.mst_location_master b,
+prwss_main.mst_location_master c,
+prwss_main.mst_location_master d,
+((        (        (        (        (        (        (        (         SELECT '1~Pre Planning (col 2)' AS training_name, th.plan_id, th.location_id, th.pre_planning_count AS cnt, '1~Phase wise detail of target swap villages' AS colhdr, 1 AS seq
+                                                                           FROM prwss_main.t_wing_training_plan_hdr th
+                                                                UNION
+                                                                         SELECT '2~Planning (col 3)' AS training_name, th.plan_id, th.location_id, th.planning_count AS cnt, '1~Phase wise detail of target swap villages' AS colhdr, 2 AS seq
+                                                                           FROM prwss_main.t_wing_training_plan_hdr th)
+                                                        UNION
+                                                                 SELECT '3~Implementation (col 4)' AS training_name, th.plan_id, th.location_id, th.implementation_count AS cnt, '1~Phase wise detail of target swap villages' AS colhdr, 3 AS seq
+                                                                   FROM prwss_main.t_wing_training_plan_hdr th)
+                                                UNION
+                                                         SELECT '4~O & M (col 5)' AS training_name, th.plan_id, th.location_id, th.operation_maintenance_count AS cnt, '1~Phase wise detail of target swap villages' AS colhdr, 4 AS seq
+                                                           FROM prwss_main.t_wing_training_plan_hdr th)
+                                        UNION
+                                                 SELECT '5~Total (col 6)' AS training_name, th.plan_id, th.location_id, th.pre_planning_count + th.planning_count + th.implementation_count + th.operation_maintenance_count AS cnt, '1~Phase wise detail of target swap villages' AS colhdr, 5 AS seq
+                                                   FROM prwss_main.t_wing_training_plan_hdr th)
+                                UNION
+                                         SELECT '6~ (col 2+col 3)' AS training_name, th.plan_id, th.location_id, th.pre_planning_count + th.planning_count AS cnt, '2~Training on project concepts,principles and role of GPWSC/GP/KOLs during preplanning and planning stages' AS colhdr, 6 AS seq
+                                           FROM prwss_main.t_wing_training_plan_hdr th)
+                        UNION
+                                 SELECT '7~(col 2+col 3+col 4)' AS training_name, th.plan_id, th.location_id, th.pre_planning_count + th.planning_count + th.implementation_count AS cnt, '3~Training on Quality aspects in Implimentation phase and if required also on O&M aspects at village level' AS colhdr, 7 AS seq
+                                   FROM prwss_main.t_wing_training_plan_hdr th)
+                UNION
+                         SELECT '8~(0.5*col 3+col 4+col 5)' AS training_name, th.plan_id, th.location_id, 0.5 * th.planning_count + th.implementation_count + th.operation_maintenance_count AS cnt, '4~Training on O&M aspects at village level' AS colhdr, 8 AS seq
+                           FROM prwss_main.t_wing_training_plan_hdr th)
+        UNION
+                 SELECT '9~(col 4+col 5/4 or 5)' AS training_name, th.plan_id, th.location_id, (th.implementation_count + th.operation_maintenance_count) / 4::numeric AS cnt, '5~Training of Technician,accounts person and pump operator on O&M aspects' AS colhdr, 9 AS seq
+                   FROM prwss_main.t_wing_training_plan_hdr th)
+UNION
+         SELECT '91~'::text || mt.training_name::text AS training_name, td.plan_id, td.location_id, td.count AS cnt, '6~Trainings' AS colhdr, 10 AS seq
+           FROM prwss_main.mst_training mt, prwss_main.t_wing_training_plan_detail td
+          WHERE mt.training_id::text = td.training_id::text
+)e,
+prwss_main.t_wing_training_plan_master f
+where a.location_id=b.parent_location
+and   b.location_id=c.parent_location
+and   c.location_id=d.parent_location
+and   d.location_id=e.location_id
+and   e.plan_id=f.plan_id
+and   f.plan_id='2'
+order by training_name,colHdr ,district desc) main
+where $P!{where}]]>
+	</queryString>
+	<field name="block" class="java.lang.String"/>
+	<field name="block_id" class="java.lang.String"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="district_id" class="java.lang.String"/>
+	<field name="circle" class="java.lang.String"/>
+	<field name="circle_id" class="java.lang.String"/>
+	<field name="zone" class="java.lang.String"/>
+	<field name="zone_id" class="java.lang.String"/>
+	<field name="cnt" class="java.math.BigDecimal"/>
+	<field name="colhdr" class="java.lang.String"/>
+	<field name="seq" class="java.lang.Integer"/>
+	<field name="training_name" class="java.lang.String"/>
+	<field name="plan_id" class="java.math.BigDecimal"/>
+	<field name="from_date" class="java.sql.Date"/>
+	<field name="to_date" class="java.sql.Date"/>
+	<group name="cnt">
+		<groupExpression><![CDATA[$F{cnt}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="126" splitType="Stretch">
+			<staticText>
+				<reportElement x="209" y="0" width="364" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="209" y="20" width="364" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Water Works Complex, Phase 2, Mohali-160055]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="209" y="40" width="364" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Tele/Fax: 0172-270101, 4330316, 4330317]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="209" y="60" width="364" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Website: www.wbprwssproject.org,  e-mail: spsspmc@gmail.com]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="97" width="802" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Capacity Building Plan For SWAp Villages]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="283" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="0" width="832" height="283"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement style="table_TH" mode="Opaque" x="0" y="0" width="70" height="231" backcolor="#CCCCFF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<text><![CDATA[District (col 1)]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="district" width="70" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{district}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#CCFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="70" height="25" backcolor="#CCFFFF"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="70" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Total district]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="colhdr" height="169" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{colhdr}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#CCCCFF" mode="Opaque" style="Crosstab Data Text">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="169" backcolor="#CCCCFF"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{colhdr}.substring($V{colhdr}.indexOf("~")+1)]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#005FB3" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="training_name" height="62" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{training_name}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#CCCCFF" mode="Opaque" style="Crosstab Data Text">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="62" backcolor="#CCCCFF"/>
+								<textElement/>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{training_name}.substring($V{training_name}.indexOf("~")+1)]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="cntMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{cnt}]]></measureExpression>
+				</measure>
+				<crosstabCell width="40" height="25">
+					<cellContents backcolor="#CCFF99" mode="Transparent">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="25" backcolor="#CCFF99"/>
+							<textElement/>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{cntMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="40" height="25" rowTotalGroup="district">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="###0">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="40" height="25"/>
+							<textElement/>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{cntMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="25" columnTotalGroup="colhdr">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="25" rowTotalGroup="district" columnTotalGroup="colhdr">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="25" columnTotalGroup="training_name">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="25" rowTotalGroup="district" columnTotalGroup="training_name">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

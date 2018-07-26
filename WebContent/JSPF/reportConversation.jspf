@@ -1,0 +1,35 @@
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
+<script language="javascript1.2" src="js/codethatcalendarstd.js"></script>
+
+<tr>
+	<td>Select Location</td>
+	<td><html:radio property="selectLocation" title="Selection"
+		value="S" styleId="selectLocation">Selection</html:radio> <html:radio
+		property="selectLocation" title="All" value="A"
+		styleId="selectLocation">All</html:radio></td>
+	<td><html:select property="locationId" styleId="locationId"
+		style="width:155px;">
+		<html:option value="NOT SPECIFIED">Select Location</html:option>
+		<html:options collection="userLocations" labelProperty="label"
+			property="value" />
+	</html:select></td>
+</tr>
+<tr>
+	<td>Period</td>
+	<td><html:text property="fromDate" styleId="fromDate"
+		styleClass="ci3"></html:text> <input class=ci4 type=button
+		onclick="c1.innerpopup('fromDate','calendar_frame');" value="..." />
+	</td>
+	<td><html:text property="toDate" styleId="toDate" styleClass="ci3"></html:text>
+	<input class=ci4 type=button
+		onclick="c1.innerpopup('toDate','calendar_frame');" value="..." /></td>
+</tr>
+<tr>
+	<td>Approval Status</td>
+	<td colspan="2"><html:radio property="approvalStatus"
+		title="Pending" value="U">Pending</html:radio> <html:radio
+		property="approvalStatus" title="Approved" value="A">Approved</html:radio>
+	<html:radio property="approvalStatus" title="All" value="UA">All</html:radio>
+	</td>
+</tr>

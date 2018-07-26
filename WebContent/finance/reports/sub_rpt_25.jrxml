@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sub_rpt_25" language="groovy" pageWidth="669" pageHeight="595" orientation="Landscape" columnWidth="629" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<queryString language="SQL">
+		<![CDATA[select  location_id,fin_year,wb_req_date,case when wb_req_amnt<>0 then round((wb_req_amnt/100000),2) else 0 end as wb_req_amnt,
+	wb_release_date,case when wb_release_amnt<>0 then round((wb_release_amnt/100000),2) else 0 end as wb_release_amnt,
+	gop_req_date,case when gop_req_amnt<>0 then round((gop_req_amnt/100000),2) else 0 end as gop_req_amnt,
+	gop_release_date,case when gop_release_amnt<>0 then round((gop_release_amnt/100000),2) else 0 end as gop_release_amnt,
+	goi_req_date,case when goi_req_amnt<>0 then round((goi_req_amnt/100000),2) else 0 end as goi_req_amnt,
+	goi_release_date,case when goi_release_amnt<>0 then round((goi_release_amnt/100000),2) else 0 end as goi_release_amnt
+from
+(select  distinct location_id,fin_year,
+	case when wb_req_date is not null and rank_1=1 then wb_req_date else null end as wb_req_date,
+		case when wb_req_amnt is not null and rank_1=1 then wb_req_amnt else 0 end as wb_req_amnt,
+		case when wb_release_date is not null and rank_1=1 then wb_release_date else null end as wb_release_date,
+		case when wb_release_amnt is not null and rank_1=1 then wb_release_amnt else 0 end as wb_release_amnt,
+
+	case when gop_req_date is not null and rank_2=1 then gop_req_date else null end as gop_req_date,
+		case when gop_req_amnt is not null and rank_2=1 then gop_req_amnt else 0 end as gop_req_amnt,
+		case when gop_release_date is not null and rank_2=1 then gop_release_date else null end as gop_release_date,
+		case when gop_release_amnt is not null and rank_2=1 then gop_release_amnt else 0 end as gop_release_amnt,
+
+	case when goi_req_date is not null and rank_3=1 then goi_req_date else null end as goi_req_date,
+		case when goi_req_amnt is not null and rank_3=1 then goi_req_amnt else 0 end as goi_req_amnt,
+		case when goi_release_date is not null and rank_3=1 then goi_release_date else null end as goi_release_date,
+		case when goi_release_amnt is not null and rank_3=1 then goi_release_amnt else 0 end as goi_release_amnt
+
+from
+(select distinct *,rank() over (partition by wb_req_date order by gop_req_amnt,goi_release_date) rank_1,
+	rank() over (partition by gop_req_date order by wb_release_date,goi_release_date) rank_2,
+	rank() over (partition by goi_req_date order by wb_release_date,gop_req_date) rank_3
+from
+(select xxx.*,goi_req_date,goi_req_amnt,goi_release_date,goi_release_amnt
+from
+(select  x.location_id,x.fin_year,x.wb_req_date,x.wb_req_amnt,x.wb_release_date,x.wb_release_amnt,
+	xx.gop_req_date,xx.gop_req_amnt,xx.gop_release_date,xx.gop_release_amnt
+from
+(select *,case when wb_release_date between to_date('2006-04-01','yyyy-mm-dd') and to_date('2007-03-31','yyyy-mm-dd') then '2006-07'
+	      when wb_release_date between to_date('2007-04-01','yyyy-mm-dd') and to_date('2008-03-31','yyyy-mm-dd') then '2007-08'
+	      when wb_release_date between to_date('2008-04-01','yyyy-mm-dd') and to_date('2009-03-31','yyyy-mm-dd') then '2008-09'
+	      when wb_release_date between to_date('2009-04-01','yyyy-mm-dd') and to_date('2010-03-31','yyyy-mm-dd') then '2009-10'
+	      when wb_release_date between to_date('2010-04-01','yyyy-mm-dd') and to_date('2011-03-31','yyyy-mm-dd') then '2010-11'
+	      when wb_release_date between to_date('2011-04-01','yyyy-mm-dd') and to_date('2012-03-31','yyyy-mm-dd') then '2011-12'
+	      when wb_release_date between to_date('2012-04-01','yyyy-mm-dd') and to_date('2013-03-31','yyyy-mm-dd') then '2012-13'
+	      when wb_release_date between to_date('2013-04-01','yyyy-mm-dd') and to_date('2014-03-31','yyyy-mm-dd') then '2013-14'
+	      when wb_release_date between to_date('2014-04-01','yyyy-mm-dd') and to_date('2015-03-31','yyyy-mm-dd') then '2014-15'
+	      when wb_release_date between to_date('2015-04-01','yyyy-mm-dd') and to_date('2016-03-31','yyyy-mm-dd') then '2015-16' end as fin_year
+from
+(select location_id,loc_request_date as wb_req_date,amount_fd_request as wb_req_amnt,loc_release_date as wb_release_date,amount_fd_release as wb_release_amnt,
+       null as gop_req_date,0 as gop_req_amnt,null as gop_rel_date,0 as gop_rel_amnt
+from prwss_main.t_finance_loc_header
+where status<>'D' and location_id='SPMC' and request_to_location_id='FD')y)x
+
+left join
+
+(select *,case when gop_release_date between to_date('2006-04-01','yyyy-mm-dd') and to_date('2007-03-31','yyyy-mm-dd') then '2006-07'
+	      when gop_release_date between to_date('2007-04-01','yyyy-mm-dd') and to_date('2008-03-31','yyyy-mm-dd') then '2007-08'
+	      when gop_release_date between to_date('2008-04-01','yyyy-mm-dd') and to_date('2009-03-31','yyyy-mm-dd') then '2008-09'
+	      when gop_release_date between to_date('2009-04-01','yyyy-mm-dd') and to_date('2010-03-31','yyyy-mm-dd') then '2009-10'
+	      when gop_release_date between to_date('2010-04-01','yyyy-mm-dd') and to_date('2011-03-31','yyyy-mm-dd') then '2010-11'
+	      when gop_release_date between to_date('2011-04-01','yyyy-mm-dd') and to_date('2012-03-31','yyyy-mm-dd') then '2011-12'
+	      when gop_release_date between to_date('2012-04-01','yyyy-mm-dd') and to_date('2013-03-31','yyyy-mm-dd') then '2012-13'
+	      when gop_release_date between to_date('2013-04-01','yyyy-mm-dd') and to_date('2014-03-31','yyyy-mm-dd') then '2013-14'
+	      when gop_release_date between to_date('2014-04-01','yyyy-mm-dd') and to_date('2015-03-31','yyyy-mm-dd') then '2014-15'
+	      when gop_release_date between to_date('2015-04-01','yyyy-mm-dd') and to_date('2016-03-31','yyyy-mm-dd') then '2015-16' end as fin_year
+from
+(select location_id,null as wb_req_date,0 as wb_req_amnt,null as wb_release_date,0 as wb_release_amnt,
+       loc_request_date as gop_req_date,amount_fd_request as gop_req_amnt,loc_release_date as gop_release_date,amount_fd_release as gop_release_amnt
+
+from prwss_main.t_finance_loc_header where status<>'D' and location_id='SPMC' and request_to_location_id='GOP')yy)xx
+
+on x.location_id=xx.location_id
+and  x.fin_year=xx.fin_year
+)xxx
+
+left join
+
+(select *,case when goi_release_date between to_date('2006-04-01','yyyy-mm-dd') and to_date('2007-03-31','yyyy-mm-dd') then '2006-07'
+	      when goi_release_date between to_date('2007-04-01','yyyy-mm-dd') and to_date('2008-03-31','yyyy-mm-dd') then '2007-08'
+	      when goi_release_date between to_date('2008-04-01','yyyy-mm-dd') and to_date('2009-03-31','yyyy-mm-dd') then '2008-09'
+	      when goi_release_date between to_date('2009-04-01','yyyy-mm-dd') and to_date('2010-03-31','yyyy-mm-dd') then '2009-10'
+	      when goi_release_date between to_date('2010-04-01','yyyy-mm-dd') and to_date('2011-03-31','yyyy-mm-dd') then '2010-11'
+	      when goi_release_date between to_date('2011-04-01','yyyy-mm-dd') and to_date('2012-03-31','yyyy-mm-dd') then '2011-12'
+	      when goi_release_date between to_date('2012-04-01','yyyy-mm-dd') and to_date('2013-03-31','yyyy-mm-dd') then '2012-13'
+	      when goi_release_date between to_date('2013-04-01','yyyy-mm-dd') and to_date('2014-03-31','yyyy-mm-dd') then '2013-14'
+	      when goi_release_date between to_date('2014-04-01','yyyy-mm-dd') and to_date('2015-03-31','yyyy-mm-dd') then '2014-15'
+	      when goi_release_date between to_date('2015-04-01','yyyy-mm-dd') and to_date('2016-03-31','yyyy-mm-dd') then '2015-16' end as fin_year
+from
+(select location_id,null as wb_req_date,0 as wb_req_amnt,null as wb_release_date,0 as wb_release_amnt,
+       null as gop_req_date,0 as gop_req_amnt,null as gop_release_date,0 as gop_release_amnt,
+       loc_request_date as goi_req_date,amount_fd_request as goi_req_amnt,loc_release_date as goi_release_date,amount_fd_release as goi_release_amnt
+from prwss_main.t_finance_loc_header where status<>'D' and location_id='SPMC' and request_to_location_id='GOI')yyy)xxxx
+
+on xxx.location_id=xxxx.location_id
+and xxx.fin_year=xxxx.fin_year
+order by xxx.fin_year)main)xyz)final
+order by fin_year,wb_release_date,gop_release_date,goi_release_date]]>
+	</queryString>
+	<field name="location_id" class="java.lang.String"/>
+	<field name="fin_year" class="java.lang.String"/>
+	<field name="wb_req_date" class="java.sql.Date"/>
+	<field name="wb_req_amnt" class="java.math.BigDecimal"/>
+	<field name="wb_release_date" class="java.sql.Date"/>
+	<field name="wb_release_amnt" class="java.math.BigDecimal"/>
+	<field name="gop_req_date" class="java.sql.Date"/>
+	<field name="gop_req_amnt" class="java.math.BigDecimal"/>
+	<field name="gop_release_date" class="java.sql.Date"/>
+	<field name="gop_release_amnt" class="java.math.BigDecimal"/>
+	<field name="goi_req_date" class="java.sql.Date"/>
+	<field name="goi_req_amnt" class="java.math.BigDecimal"/>
+	<field name="goi_release_date" class="java.sql.Date"/>
+	<field name="goi_release_amnt" class="java.math.BigDecimal"/>
+	<variable name="wb_req_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{wb_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="wb_release_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{wb_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="gop_req_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{gop_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="gop_release_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{gop_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="goi_req_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{goi_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="goi_release_amnt_1" class="java.math.BigDecimal" resetType="Group" resetGroup="fin_year_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{goi_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="wb_req_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{wb_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="wb_release_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{wb_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="gop_req_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gop_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="gop_release_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gop_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="goi_req_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{goi_req_amnt}]]></variableExpression>
+	</variable>
+	<variable name="goi_release_amnt_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{goi_release_amnt}]]></variableExpression>
+	</variable>
+	<variable name="wb_release_amnt_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{wb_release_amnt}]]></variableExpression>
+	</variable>
+	<group name="fin_year_grp">
+		<groupExpression><![CDATA[$F{fin_year}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField>
+					<reportElement style="table_TD" x="0" y="0" width="76" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{fin_year}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="76" y="0" width="74" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_req_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="150" y="0" width="84" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_release_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="234" y="0" width="73" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{gop_req_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="307" y="0" width="84" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{gop_release_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="391" y="0" width="73" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{goi_req_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="464" y="0" width="84" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{goi_release_amnt_1}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Group" evaluationGroup="fin_year_grp">
+					<reportElement style="table_TD" x="548" y="0" width="81" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_release_amnt_1}+$V{gop_release_amnt_1}+$V{goi_release_amnt_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="76" y="0" width="158" height="20" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[World Bank Share]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="234" y="0" width="157" height="20" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[GOP Share]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="391" y="0" width="157" height="20" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[GOI Share]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="548" y="0" width="81" height="51" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Total Amount received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="391" y="20" width="73" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Requested]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="464" y="20" width="84" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="307" y="20" width="84" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="234" y="20" width="73" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Requested]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="150" y="20" width="84" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="76" y="20" width="74" height="31" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Amount Requested]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="76" height="51" forecolor="#000000" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Financial Year]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="76" y="0" width="74" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_req_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="150" y="0" width="84" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_release_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="234" y="0" width="73" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{gop_req_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="307" y="0" width="84" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{gop_release_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="391" y="0" width="73" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{goi_req_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="464" y="0" width="84" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{goi_release_amnt_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement style="table_TD" mode="Opaque" x="548" y="0" width="81" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{wb_release_amnt_3}+$V{gop_release_amnt_2}+$V{goi_release_amnt_2}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="76" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Grand Total:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

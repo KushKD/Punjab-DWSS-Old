@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CCDURPT001_2" language="groovy" pageWidth="849" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="839" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="5" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="queryString" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA[" 1=1 "]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2008-04-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-03-31"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2008-04-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-03-31"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select district_id,district,
+	sum(case when activity_name ='Puppet Show' and cnt is not null then cnt else 0 end) as Puppet_Show,
+	sum(case when activity_name ='Social Mapping' and cnt is not null then cnt else 0 end) as Social_Mapping,
+	sum(case when activity_name ='Any other major event' and cnt is not null then cnt else 0 end) as Any_other_major_event,
+	sum(case when activity_name ='School Level Competition' and cnt is not null then cnt else 0 end) as School_Level_Competition,
+	sum(case when activity_name ='Wall writing/painting' and cnt is not null then cnt else 0 end) as Wall_writing_painting,
+	sum(case when activity_name ='Water Quality Testing' and cnt is not null then cnt else 0 end) as Water_Quality_Testing,
+	sum(case when activity_name ='School Rallies' and cnt is not null then cnt else 0 end) as School_Rallies,
+	sum(case when activity_name ='Inter-personal Communication' and cnt is not null then cnt else 0 end) as Inter_personal_Communication,
+	sum(case when activity_name  like '%Exposure Visit%' and cnt is not null then cnt else 0 end) as Exposure_Visit,
+	sum(case when activity_name ='Street Play-Nukkad Natak' and cnt is not null then cnt else 0 end) as Street_Play_Nukkad_Natak,
+	sum(case when activity_name ='Pamphlate Distribution' and cnt is not null then cnt else 0 end) as Pamphlate_Distribution,
+	sum(case when activity_name ='Muniyadi Campaign' and cnt is not null then cnt else 0 end) as Muniyadi_Campaign,
+	sum(case when activity_name ='Poster Display' and cnt is not null then cnt else 0 end) as Poster_Display,
+	sum(case when activity_name ='Media Resource Group' and cnt is not null then cnt else 0 end) as Media_Resource_Group
+from
+(select district_id,district,activity_name,count(activity_name) as cnt,sum(no_of_participants)
+from
+(select * from
+(select z.zone_id,zone_name as zone,c.circle_id,circle_name as circle,d.district_id,district_name as district,xx.*
+from
+(select x.*,item_name as material_name,quantity
+from
+(select location_id,iec_progress_id,ip.village_id,village_name,iec_name as activity_name,activity_date,no_of_participants,outcome
+from prwss_main.t_ccdu_iec_progress ip,prwss_main.mst_village mv,prwss_main.mst_ccdu_iec_activity ia
+where ip.village_id=mv.village_id
+and   ip.activity_id=ia.iec_activity_id
+and   mv.status<>'D' and ia.status<>'D'
+and ip.status<>'D')x
+left join
+(select mit.item_name,mu.quantity,mu.iec_progress_id
+from
+prwss_main.t_ccdu_iec_material_utilization mu,
+prwss_main.mst_item mit
+where mu.item_id=mit.item_id
+and mu.status<>'D' and mit.status<>'D' ) mu_mit
+on  x.iec_progress_id=mu_mit.iec_progress_id) xx,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where xx.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+and   activity_date between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+) main
+where $P!{where}
+order by zone,circle,district,activity_name)xxxx
+group by district_id,district,activity_name)main
+group by district_id,district]]>
+	</queryString>
+	<field name="district_id" class="java.lang.String"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="puppet_show" class="java.math.BigDecimal"/>
+	<field name="social_mapping" class="java.math.BigDecimal"/>
+	<field name="any_other_major_event" class="java.math.BigDecimal"/>
+	<field name="school_level_competition" class="java.math.BigDecimal"/>
+	<field name="wall_writing_painting" class="java.math.BigDecimal"/>
+	<field name="water_quality_testing" class="java.math.BigDecimal"/>
+	<field name="school_rallies" class="java.math.BigDecimal"/>
+	<field name="inter_personal_communication" class="java.math.BigDecimal"/>
+	<field name="exposure_visit" class="java.math.BigDecimal"/>
+	<field name="street_play_nukkad_natak" class="java.math.BigDecimal"/>
+	<field name="pamphlate_distribution" class="java.math.BigDecimal"/>
+	<field name="muniyadi_campaign" class="java.math.BigDecimal"/>
+	<field name="poster_display" class="java.math.BigDecimal"/>
+	<field name="media_resource_group" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="52" width="425" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Abstract Of IEC Activities Undertaken]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="26" width="178" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CCDU Report 8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="839" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation, Punjab]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="224" y="21" width="371" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Website: www.pbdwss.gov.in]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="610" y="52" width="92" height="20"/>
+				<box leftPadding="4"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{from}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="574" y="52" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[From:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="702" y="52" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="738" y="52" width="100" height="20"/>
+				<box leftPadding="4"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{to}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="93" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="110" y="0" width="53" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Puppet Show]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="212" y="0" width="44" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Any other major event]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="412" y="0" width="54" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[School Rallies]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="306" y="0" width="51" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Wall writing / painting]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="357" y="0" width="55" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Water Quality Testing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="256" y="0" width="50" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[School Level Competition]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="520" y="0" width="53" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Exposure Visit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="680" y="0" width="51" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Muniyadi Campaign]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="731" y="0" width="55" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Poster Display]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="0" y="0" width="25" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sr. No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="357" y="77" width="55" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="212" y="77" width="44" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="110" y="77" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="0" y="77" width="25" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="306" y="77" width="51" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="412" y="77" width="54" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[9]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="520" y="77" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="256" y="77" width="50" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="731" y="77" width="55" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="680" y="77" width="51" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="163" y="77" width="49" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="163" y="0" width="49" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Social Mapping]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="466" y="77" width="54" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="466" y="0" width="54" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Inter-personal Communication]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="573" y="77" width="51" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="573" y="0" width="51" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Street Play-Nukkad Natak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="624" y="0" width="56" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pamphlate Distribution]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="624" y="77" width="56" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[13]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="786" y="77" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[16]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="786" y="0" width="53" height="77" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Media Resource Group]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="25" y="0" width="85" height="77" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[District]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="25" y="77" width="85" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="25" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="25" y="0" width="85" height="20"/>
+				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{district}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="110" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{puppet_show}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="163" y="0" width="49" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{social_mapping}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="212" y="0" width="44" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{any_other_major_event}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="256" y="0" width="50" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{school_level_competition}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="306" y="0" width="51" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{wall_writing_painting}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="357" y="0" width="55" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{water_quality_testing}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="412" y="0" width="54" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{school_rallies}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="466" y="0" width="54" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{inter_personal_communication}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="520" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{exposure_visit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="573" y="0" width="51" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{street_play_nukkad_natak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="624" y="0" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{pamphlate_distribution}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="680" y="0" width="51" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{muniyadi_campaign}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="731" y="0" width="55" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{poster_display}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="786" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{media_resource_group}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="289" y="1" width="203" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CCDU Report 8]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="82" y="1" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="1" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="738" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20"/>
+	</summary>
+</jasperReport>

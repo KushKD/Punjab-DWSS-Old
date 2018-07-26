@@ -1,0 +1,1042 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CCDURPT001_2" language="groovy" pageWidth="878" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="868" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="5" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box padding="2">
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="queryString" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA[" 1=1 "]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2008-04-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to_date" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-03-31"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="from" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2008-04-01"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="to" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2012-03-31"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  *
+from
+(select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,village_id,village_name,divisional_office_id,nc_pc_status,phase_village,training_name,date_of_training,
+	total_participants,decision_taken,action_by_when,action_by_whom,outcome,cast(prog_id as text),issues_emerged_during_training,expenditure,households,population,scheme_funded_by,
+	training_officer,tr_level,
+	case when tr_level=1 then 'District Level'
+	     when tr_level=2 then 'Block Level'
+	     when tr_level=3 then 'Village Level' end as training_level
+from
+(select  zone_id,zone_name,circle_id,circle_name,district_id,district_name,null block,null as village_id,null as village_name,null divisional_office_id,null nc_pc_status,null phase_village,
+	training_name,date_of_training,sum(total_participants) total_participants,decision_taken,action_by_when,action_by_whom,
+	outcome,array_agg(prog_id) prog_id,issues_emerged_during_training,sum(expenditure) expenditure,null households,
+	null population,null scheme_funded_by,cast(training_officer as character varying)training_officer,tr_level
+from
+(select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,1 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='District Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)x
+group by zone_id,zone_name,circle_id,circle_name,district_id,district_name,training_name,date_of_training,decision_taken,issues_emerged_during_training,action_by_when,
+	 action_by_whom,training_officer,outcome,tr_level
+
+union all
+
+select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,cast(array_agg(village_id) as character varying) as village_id,cast(array_agg(village_name) as character varying) as village_name,divisional_office_id,
+	cast(array_agg(nc_pc_status) as character varying) nc_pc_status,cast(array_agg(phase_village)  as character varying),training_name,date_of_training,
+	sum(total_participants) total_participants,cast(array_agg(decision_taken) as character varying) decision_taken,action_by_when,cast(array_agg(action_by_whom) as character varying) action_by_whom,cast(array_agg(outcome) as character varying) outcome,
+	array_agg(prog_id) prog_id,cast(array_agg(issues_emerged_during_training) as character varying) issues_emerged_during_training,sum(expenditure) expenditure,
+	sum(households) households,sum(population) population,'' scheme_funded_by,replace(cast(array_agg(cast(training_officer as character varying)) as character varying),'NULL','') training_officer,tr_level
+from
+(select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,2 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='Block Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)xx
+group by zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,training_name,date_of_training,divisional_office_id,action_by_when,tr_level)dib_blk
+
+
+union all
+
+select zone_id,zone_name,circle_id,circle_name,district_id,district_name,block,village_id,village_name,divisional_office_id,nc_pc_status,phase_village,training_name,date_of_training,
+	total_participants,decision_taken,action_by_when,action_by_whom,outcome,prog_id,issues_emerged_during_training,expenditure,households,population,scheme_funded_by,
+	cast(training_officer as character varying) training_officer,tr_level,
+	case when tr_level=1 then 'District Level'
+	     when tr_level=2 then 'Block Level'
+	     when tr_level=3 then 'Village Level' end as training_level
+from (select * from
+(select xx.*,households,total_population as population,scheme_funded_by,
+	case when array_agg(training_officer)='{NULL}' then null else array_agg(training_officer) end as training_officer,3 tr_level
+from
+(select x.*,phase_of_village as phase_village,training_name,date_of_training,total_participants,recommendation_id as decision_taken,action_by_whom,action_by_when,
+	case when outcome_id='Any other' then other_outcome else  outcome_id end as outcome,(tp.training_id||'-'||cb_progress_id) as prog_id
+       ,case when issue_id='isue00' then other_issue else ccdu_issue_name end as issues_emerged_during_training,cb_progress_id,level_of_traning,expenditure
+from prwss_main.t_ccdu_cb_training_progress tp,
+(select mz.zone_id,zone_name,mc.circle_id,circle_name,md.district_id,district_name,divisional_id as location_id,block_name as block,mv.village_id,village_name,
+	divisional_office_id,nc_pc.nc_pc_status
+from prwss_main.mst_village mv,prwss_main.tbl_proposed_program_2008 nc_pc,prwss_main.mst_block mb,prwss_main.mst_divisional di,prwss_main.mst_district md,
+	prwss_main.mst_circle mc,prwss_main.mst_zone mz
+where mv.village_id=nc_pc.village_id
+and   mv.block_id=mb.block_id
+and   mv.divisional_office_id=di.divisional_id
+and   di.district_id=md.district_id
+and   md.circle_id=mc.circle_id
+and   mc.zone_id=mz.zone_id
+and mv.status<>'D')x,prwss_main.mst_ccdu_issue mci,prwss_main.mst_training mt
+where tp.village_id=x.village_id
+and   tp.issue_id=mci.ccdu_issue_id
+and   tp.training_id=mt.training_id
+and   tp.status<>'D' and mci.status<>'D'
+and   level_of_traning='Village Level'
+and   date_of_training between to_date($P{from_date},'yyyy-mm-dd') and to_date($P{to_date},'yyyy-mm-dd')
+)xx
+
+left outer join
+(
+select population_id,village_id,(gen_population+sc_population+st_population)total_population,population_year,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,population_id desc) as row_id
+from prwss_main.mst_village_population mp
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) pop
+where row_id=1
+)xp on xx.village_id=xp.village_id
+---------------------------------household ---------------------------------------------
+left outer join
+(
+select household_id,village_id,(sc_households+gc_households) as households,as_on_date from
+(select *,rank() over (partition by village_id order by as_on_date desc,household_id desc) as row_id
+from prwss_main.mst_village_households
+where as_on_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)xh on xx.village_id=xh.village_id
+---------------------------------commissioning ---------------------------------------------
+left outer join
+(
+select sh.scheme_id,village_id,program_name as scheme_funded_by
+from prwss_main.mst_scheme_header sh,prwss_main.mst_scheme_details sd,prwss_main.mst_program p,
+(
+select scheme_id,village_id,scheme_commissioned_date from
+(select *,rank() over (partition by village_id order by scheme_commissioned_date desc,scheme_id desc) as row_id
+from prwss_main.mst_scheme_village
+where scheme_commissioned_date <=to_date($P{to_date},'yyyy-MM-dd') and
+status<>'D'
+order by village_id) con
+where row_id=1
+)sv
+where sh.scheme_id=sd.scheme_id
+and sd.scheme_id=sv.scheme_id
+and sh.prog_id=p.program_id
+and sh.status<>'D'
+and sd.status<>'D')xcom
+on xx.village_id=xcom.village_id
+
+left join
+
+(select cb_progress_id,me.employee_name as training_officer
+from prwss_main.t_ccdu_cb_training_officers cto,prwss_main.mst_employee me
+where cto.employee_id=me.employee_id) tof
+on xx.cb_progress_id=tof.cb_progress_id
+group by xx.zone_id,xx.zone_name,xx.circle_id,xx.circle_name,xx.district_id,xx.district_name,xx.location_id,xx.block,xx.village_id,xx.village_name,xx.divisional_office_id
+,xx.nc_pc_status,xx.phase_village,xx.training_name,xx.date_of_training,xx.total_participants,xx.decision_taken,xx.action_by_whom,xx.action_by_when,xx.outcome,prog_id,
+xx.issues_emerged_during_training,xx.cb_progress_id,xh.households,xp.total_population,xcom.scheme_funded_by,expenditure,level_of_traning) main
+order by level_of_traning)xxx) final
+where $P!{where}
+order by  district_name,tr_level]]>
+	</queryString>
+	<field name="zone_id" class="java.lang.String"/>
+	<field name="zone_name" class="java.lang.String"/>
+	<field name="circle_id" class="java.lang.String"/>
+	<field name="circle_name" class="java.lang.String"/>
+	<field name="district_id" class="java.lang.String"/>
+	<field name="district_name" class="java.lang.String"/>
+	<field name="block" class="java.lang.String"/>
+	<field name="village_id" class="java.lang.String"/>
+	<field name="village_name" class="java.lang.String"/>
+	<field name="divisional_office_id" class="java.lang.String"/>
+	<field name="nc_pc_status" class="java.lang.String"/>
+	<field name="phase_village" class="java.lang.String"/>
+	<field name="training_name" class="java.lang.String"/>
+	<field name="date_of_training" class="java.sql.Date"/>
+	<field name="total_participants" class="java.math.BigDecimal"/>
+	<field name="decision_taken" class="java.lang.String"/>
+	<field name="action_by_when" class="java.sql.Date"/>
+	<field name="action_by_whom" class="java.lang.String"/>
+	<field name="outcome" class="java.lang.String"/>
+	<field name="prog_id" class="java.lang.String"/>
+	<field name="issues_emerged_during_training" class="java.lang.String"/>
+	<field name="expenditure" class="java.math.BigDecimal"/>
+	<field name="households" class="java.math.BigDecimal"/>
+	<field name="population" class="java.math.BigDecimal"/>
+	<field name="scheme_funded_by" class="java.lang.String"/>
+	<field name="training_officer" class="java.lang.String"/>
+	<field name="tr_level" class="java.lang.Integer"/>
+	<field name="training_level" class="java.lang.String"/>
+	<variable name="village_id_1" class="java.lang.Integer" resetType="Group" resetGroup="district_grp" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{village_id}]]></variableExpression>
+	</variable>
+	<variable name="households_2" class="java.math.BigDecimal" resetType="Group" resetGroup="district_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{households}]]></variableExpression>
+	</variable>
+	<variable name="population_2" class="java.math.BigDecimal" resetType="Group" resetGroup="district_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{population}]]></variableExpression>
+	</variable>
+	<variable name="training_name_3" class="java.lang.Integer" resetType="Group" resetGroup="district_grp" calculation="Count">
+		<variableExpression><![CDATA[$F{training_name}]]></variableExpression>
+	</variable>
+	<variable name="total_participants_2" class="java.math.BigDecimal" resetType="Group" resetGroup="district_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_participants}]]></variableExpression>
+	</variable>
+	<variable name="expenditure_2" class="java.math.BigDecimal" resetType="Group" resetGroup="district_grp" calculation="Sum">
+		<variableExpression><![CDATA[$F{expenditure}]]></variableExpression>
+	</variable>
+	<group name="district_grp">
+		<groupExpression><![CDATA[$F{district_name}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="868" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{zone_name}+" Circle: "+$F{circle_name}+" District: "+$F{district_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="29">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="78" y="0" width="65" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{village_id_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" mode="Opaque" x="172" y="0" width="39" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{households_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" mode="Opaque" x="211" y="0" width="39" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{population_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="385" y="0" width="59" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{training_name_3}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="561" y="0" width="27" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{total_participants_2}]]></textFieldExpression>
+				</textField>
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="815" y="0" width="53" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{expenditure_2}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="143" y="0" width="29" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="250" y="0" width="135" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="444" y="0" width="117" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="588" y="0" width="227" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="78" height="29" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<text><![CDATA[District Total:]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="tr_level">
+		<groupExpression><![CDATA[$F{training_level}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField pattern="" isBlankWhenNull="false">
+					<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="868" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="9" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{training_level}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="52" width="425" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Monthly Capacity Training Report Of GPWSC/GP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="26" width="178" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CCDU Report 4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="839" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation, Punjab]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="224" y="21" width="371" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Website: www.pbdwss.gov.in]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="595" y="52" width="92" height="20"/>
+				<box leftPadding="4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{from}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="559" y="52" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[From:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="687" y="52" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="723" y="52" width="100" height="20"/>
+				<box leftPadding="4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{to}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="88" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="25" y="0" width="53" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Block]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="143" y="0" width="29" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NC/PC Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="305" y="0" width="40" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Scheme Funded By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="211" y="0" width="39" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Population]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="250" y="0" width="55" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Phase of Village]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="172" y="0" width="39" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. of Households]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="444" y="0" width="53" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Training]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="588" y="0" width="56" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Issues emerged during Training]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="644" y="0" width="36" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Decision Taken]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="752" y="0" width="63" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Outcome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="0" y="0" width="25" height="72" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sr. No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="250" y="72" width="55" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="143" y="72" width="29" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="25" y="72" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="0" y="72" width="25" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="211" y="72" width="39" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="305" y="72" width="40" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="444" y="72" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="644" y="72" width="36" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="172" y="72" width="39" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="752" y="72" width="63" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[17]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="588" y="72" width="56" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[13]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="78" y="72" width="65" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="78" y="0" width="65" height="72" backcolor="#CCCCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name of Village]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="385" y="72" width="59" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[9]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="385" y="0" width="59" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name of Training]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="497" y="72" width="63" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="497" y="0" width="63" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Training Officer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="560" y="0" width="28" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Participants]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="560" y="72" width="28" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="680" y="0" width="36" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Action By Whome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="680" y="72" width="36" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="716" y="0" width="36" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Action By When]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="716" y="72" width="36" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[16]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="815" y="72" width="53" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[18]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="815" y="0" width="53" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Expenditure Incurred on Training
+(In Rs.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" mode="Opaque" x="345" y="72" width="40" height="16" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="345" y="0" width="40" height="72" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Progress ID]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="25" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="25" y="0" width="53" height="20"/>
+				<box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{block}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="78" y="0" width="65" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{village_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="143" y="0" width="29" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nc_pc_status}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="172" y="0" width="39" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{households}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="211" y="0" width="39" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{population}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="250" y="0" width="55" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{phase_village}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="305" y="0" width="40" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{scheme_funded_by}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="385" y="0" width="59" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{training_name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd-MMM-yyyy" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="444" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{date_of_training}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="497" y="0" width="63" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{training_officer}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="560" y="0" width="28" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total_participants}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="588" y="0" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{issues_emerged_during_training}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="644" y="0" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{decision_taken}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="680" y="0" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{action_by_whom}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="716" y="0" width="36" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{action_by_when}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="752" y="0" width="63" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{outcome}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="815" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{expenditure}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement style="table_TD" stretchType="RelativeToTallestObject" mode="Opaque" x="345" y="0" width="40" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{prog_id}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="289" y="1" width="203" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[CCDU Report 4]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement x="82" y="1" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="1" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="731" y="1" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="100">
+			<subreport>
+				<reportElement x="197" y="0" width="200" height="100"/>
+				<subreportParameter name="to">
+					<subreportParameterExpression><![CDATA[$P{to}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="queryString">
+					<subreportParameterExpression><![CDATA[$P{queryString}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="to_date">
+					<subreportParameterExpression><![CDATA[$P{to_date}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="from">
+					<subreportParameterExpression><![CDATA[$P{from}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="where">
+					<subreportParameterExpression><![CDATA[$P{where}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="from_date">
+					<subreportParameterExpression><![CDATA[$P{from_date}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "CCDURPT001_4Copy.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

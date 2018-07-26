@@ -1,0 +1,519 @@
+@charset "UTF-8";
+
+/* SpryMenuBarVertical.css - version 0.6 - Spry Pre-Release 1.6.1 */
+
+/* Copyright (c) 2006. Adobe Systems Incorporated. All rights reserved. */
+
+/*******************************************************************************
+
+ LAYOUT INFORMATION: describes box model, positioning, z-order
+
+ *******************************************************************************/
+
+ body{
+	/*
+	background-color:#CCCCCC;
+	font-family:Verdana, Geneva, sans-serif;
+*/
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0; 
+	padding: 0;
+	color: black;
+	background-repeat:repeat-x;
+	background-position: top center;
+	background-color:DeepSkyBlue;
+	font-size: 75%;
+	background:url(../images/header.jpg) repeat;
+	 }
+ 
+ 
+ 
+ 
+ 
+ 
+ div#written-content
+ {
+	top:0;
+	position:relative
+	width:87.2%;
+	visibility: inherit;
+	height:47%;
+    
+ 
+ }
+ div#written-internal-content{
+	
+	width:87.2%;
+	
+	
+	visibility: inherit;
+	height:47%;
+
+ }
+
+
+ div#wc-left
+ {
+	height:400px;
+	visibility: inherit;
+	background-color:WhiteSmoke;
+ }
+ div#wc-divide1
+ {	
+ width:3px;
+ height:280px;
+ visibility: inherit; 
+ background-color:grey;
+ }
+ div#wc-middle
+ {
+ height:400px;
+visibility: inherit; 
+background-color:WhiteSmoke; 
+ }
+ div#wc-divide2
+ {
+ width:3px;
+ height:280px;
+ visibility: inherit; 
+  background-color:grey;
+ }
+ div#wc-right
+ {
+ height:400px;
+ visibility: inherit; 
+ background-color:WhiteSmoke; 
+ }
+
+
+ div#marquee{
+background-color:#3bb9ff;
+/*
+font-family:tahoma;
+font-size:14px;
+*/
+background:url(../images/topmarquee.jpg) repeat;
+color:RoyalBlue;
+
+ width:100%;
+ visibility: inherit;
+ height:5%
+ }
+ 
+ div#disclaimer
+ {
+
+
+	visibility: visible;
+	visibility: inherit;
+	border:1px solid #fff;
+	width:100.3%;
+	background-color:grey
+	
+ }
+ 
+   div#right-top-inner
+ {
+	width:100%;
+	height:20%;
+
+	visibility: inherit;
+	z-index:-2000;
+	
+ }
+   div#right-middle-inner
+ {
+	width:100%;
+	height:20%;
+
+	visibility: inherit;
+	z-index:-2000;
+	
+ }
+   div#right-bottom-inner
+ {
+	width:100%;
+	height:20%;
+
+	visibility: inherit;
+	z-index:-2000;
+	
+ }
+  div#banner
+ {
+
+	width:100%;
+	height:25%;
+
+	visibility: inherit;
+	z-index:-2000;
+	
+ }
+ 
+   div#banner-inner
+ {
+	width:100%;
+	height:24%;
+
+	visibility: inherit;
+	z-index:-2000;
+	
+ }
+ div#left{
+
+
+	width:100%;
+	height:64%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#088a4b;
+	
+	
+	   }
+
+div#content{
+	width:80%;
+	height:95%;
+	visibility: inherit;
+z-index:-1500;
+
+ }
+ div#search{
+	width:100%;
+	height:5%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#56a5ec;
+	
+	
+ }
+ div#input{
+	width:80%;
+	height:5%;
+
+	overflow: invisible;
+	visibility: visible;
+	
+	
+ }
+  div#button{
+	width:20%;
+	height:5%;
+	overflow: invisible;
+	visibility: visible;
+	
+	
+ }
+ 
+ div#whatsnew {
+	width:100%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	min-height:20px;
+	z-index:6001;
+	font-family:Trebuchet MS;
+ }
+ 
+ div#notification{
+	width:100%;
+	height:30%;
+	overflow: invisible;
+	visibility: visible;
+	z-index:500;
+	
+ }
+ 
+ div#miscellaneous{
+	width:100%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	min-height:120px;
+	z-index:600;
+	font-family:Trebuchet MS;
+ }
+
+  div#event{
+	width:100%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	z-index:6000;
+	min-height:20px;
+	font-family:Trebuchet MS;
+ }
+
+ div#useful-links {
+	width:100%;
+	overflow: invisible;
+	visibility: visible;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	height:108px;
+	z-index:600;
+	font-family:Trebuchet MS;
+ }
+ 
+ div#useful-links a{
+	 /*
+	font-family:tahoma;
+	font-size:13px;
+	*/
+	color:#000;
+	text-decoration:none;
+	font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+ }
+ 
+ div#citizen {
+	height:192px;
+	overflow: invisible;
+	visibility:inherit;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	
+	
+ }
+
+#citizen a {
+	font: 11px tahoma, arial, sans-serif;
+	color:#000;	
+	display:block;
+	
+	padding-top:8px;
+	padding-left:10px;
+	text-decoration:none;
+	
+	
+}
+
+#citizen a:hover {
+	font: 11px tahoma, arial, sans-serif;
+	color:#fff;	
+	display:block;
+	background-color:#3f96a9
+	padding-top:10px;
+	
+}
+
+ div#feedback{
+	min-height:48px;
+	overflow: invisible;
+	visibility:inherit;
+	background-color:#56a5ec;
+	background:url(/dwss/bg2.jpg) repeat;
+	
+	
+ }
+
+#feedback a {
+	font: 11px tahoma, arial, sans-serif;
+	color:#000;	
+	display:block;
+	
+	padding-top:8px;
+	padding-left:10px;
+	text-decoration:none;
+	
+	
+}
+
+#feedback a:hover {
+	font: 11px tahoma, arial, sans-serif;
+	color:#fff;	
+	display:block;
+	background-color:#3f96a9
+	padding-top:10px;
+	
+}
+
+
+ div#portals
+ {
+	background-color:red;
+	overflow: invisible;
+	visibility: visible;
+width:150px;
+
+	
+ }
+  div#navigation
+ {
+	width:100%;
+	height:5%;	
+ }
+ div#slide{
+  z-index:-500;
+ }
+ 
+
+div#right-content{
+	width:16%;
+	overflow: invisible;
+	visibility: visible;	
+	height:97%;
+	border:1px solid #fff;
+	background-color#56a5ec;
+	
+ }
+ div#left-content{
+
+
+	width:15%;
+	height:95%;
+	overflow: invisible;
+	visibility: visible;
+	border:1px solid #fff;
+	background-color:#56a5ec;
+	
+ }
+ /* The outermost container of the Menu Bar, a fixed width box with no margin or padding */
+ul.MenuBarVertical
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	font-size: 100%;
+	cursor: default;
+	width: 100%;
+	z-index: 1000;
+	border:2px solid #000;
+       
+}
+/* Set the active Menu Bar with this class, currently setting z-index to accomodate IE rendering bug: http://therealcrisp.xs4all.nl/meuk/IE-zindexbug.html */
+ul.MenuBarActive
+{
+	z-index: 1000;
+}
+/* Menu item containers, position children relative to this container and are same fixed width as parent */
+ul.MenuBarVertical li
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	font-size: 100%;
+	position: relative;
+	text-align: left;
+	cursor: pointer;
+	width: 100%;
+		z-index: 1000;
+
+	
+}
+/* Submenus should appear slightly overlapping to the right (95%) and up (-5%) with a higher z-index, but they are initially off the left side of the screen (-1000em) */
+ul.MenuBarVertical ul
+{
+	margin: -5% 0 0 95%;
+	padding: 0;
+	list-style-type: none;
+	font-size: 100%;
+	position: absolute;
+	z-index: 1020;
+	cursor: default;
+	width: 11em;
+	left: -1000em;
+	top: 0;
+}
+/* Submenu that is showing with class designation MenuBarSubmenuVisible, we set left to 0 so it comes onto the screen */
+ul.MenuBarVertical ul.MenuBarSubmenuVisible
+{
+	left: 0;
+}
+/* Menu item containers are same fixed width as parent */
+ul.MenuBarVertical ul li
+{
+	width: inherit;
+}
+
+/*******************************************************************************
+
+ DESIGN INFORMATION: describes color scheme, borders, fonts
+
+ *******************************************************************************/
+
+/* Outermost menu container has borders on ul.MenuBarVertical
+{
+	
+}
+/* Submenu containers have borders on all sides */
+ul.MenuBarVertical ul
+{
+	border:1px solid #fff;
+}
+/* Menu items are a light gray block with padding and no text decoration */
+ul.MenuBarVertical a
+{
+	display: block;
+	cursor: pointer;	
+	background-position: 194 50;
+	background-color:DarkCyan;
+	padding: 0.5em 0.75em;
+	color: #000;
+	text-decoration: none; /*font-family: 'Times New Roman' , Times, serif;*/
+	/*
+	font-size: 13px;
+	font-family:tahoma;
+	*/
+	
+}
+/* Menu items that have mouse over or focus have a blue background and white text */
+ul.MenuBarVertical a:hover, ul.MenuBarVertical a:focus
+{
+	/*font-family: 'Times New Roman' , Times, serif;
+	font-size: 13px;*/
+	background:url(/dwss/images/bg.jpg) repeat;
+	color: #fff;
+}
+/* Menu items that are open with submenus are set to MenuBarItemHover with a blue background and white text */
+ul.MenuBarVertical a.MenuBarItemHover, ul.MenuBarVertical a.MenuBarItemSubmenuHover, ul.MenuBarVertical a.MenuBarSubmenuVisible
+{
+background-color: BLUE;
+}
+
+/*******************************************************************************
+
+ SUBMENU INDICATION: styles if there is a submenu under a given menu item
+
+ *******************************************************************************/
+
+/* Menu items that have a submenu have the class designation MenuBarItemSubmenu and are set to use a background image positioned on the far left (95%) and centered vertically (50%) */
+ul.MenuBarVertical a.MenuBarItemSubmenu
+{ background:url(/dwss/bg2.jpg) repeat;
+	
+}
+
+/* Menu items that are open with submenus have the class designation MenuBarItemSubmenuHover and are set to use a "hover" background image positioned on the far left (95%) and centered vertically (50%) */
+ul.MenuBarVertical a.MenuBarItemSubmenuHover
+{
+	background-image:url(../images/3p1.jpg);
+	background-image: url(SpryMenuBarRightHover.gif);
+	background-repeat: no-repeat;
+	background-position: 95% 50%;
+}
+
+/*******************************************************************************
+
+ BROWSER HACKS: the hacks below should not be changed unless you are an expert
+
+ *******************************************************************************/
+
+/* HACK FOR IE: to make sure the sub menus show above form controls, we underlay each submenu with an iframe */
+ul.MenuBarVertical iframe
+{
+	position: absolute;
+	z-index: 1010;
+	filter:alpha(opacity:0.1);
+}
+/* HACK FOR IE: to stabilize appearance of menu items; the slash in float is to keep IE 5.0 from parsing */
+@media screen, projection
+{
+	ul.MenuBarVertical li.MenuBarItemIE
+	{
+		display: inline;
+		float: left;
+		background: #FFF;
+	}
+}

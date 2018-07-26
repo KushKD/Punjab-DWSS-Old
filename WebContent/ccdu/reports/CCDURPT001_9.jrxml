@@ -1,0 +1,1035 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CCDURPT001_6" language="groovy" pageWidth="835" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="825" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="19"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#EFF7FF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="queryString" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="where" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1=1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fincode" class="java.lang.String">
+		<defaultValueExpression><![CDATA["5"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="month" class="java.lang.String">
+		<defaultValueExpression><![CDATA["03"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select c.* from
+(select b.* from
+(select a.* from
+(select
+	training_id,training_name,'target' as ordr,1 seq,
+	sum(case when district ='Amritsar' and target is not null then target else 0 end) as Amritsar_est_trng,
+	sum(case when district ='Barnala'  and target is not null then target else 0 end) as Barnala_est_trng,
+	sum(case when district ='Bathinda'  and target is not null then target else 0 end) as Bathinda_est_trng,
+	sum(case when district ='Faridkot'  and target is not null then target else 0 end) as Faridkot_est_trng,
+	sum(case when district ='Fatehgarh Sahib'  and target is not null then target else 0 end) as FatehgarhSahib_est_trng,
+	sum(case when district ='Ferozepur'  and target is not null then target else 0 end) as Ferozepur_est_trng,
+	sum(case when district ='Gurdaspur'  and target is not null then target else 0 end) as Gurdaspur_est_trng,
+	sum(case when district ='Hoshiarpur'  and target is not null then target else 0 end) as Hoshiarpur_est_trng,
+	sum(case when district ='Jalandhar'  and target is not null then target else 0 end) as Jalandhar_est_trng,
+	sum(case when district ='Kapurthala'  and target is not null then target else 0 end) as Kapurthala_est_trng,
+	sum(case when district ='Ludhiana'  and target is not null then target else 0 end) as Ludhiana_est_trng,
+	sum(case when district ='Mansa'  and target is not null then target else 0 end) as Mansa_est_trng,
+	sum(case when district ='Moga'  and target is not null then target else 0 end) as Moga_est_trng,
+	sum(case when district ='Muktsar'  and target is not null then target else 0 end) as Muktsar_est_trng,
+	sum(case when district ='Nawanshahar'  and target is not null then target else 0 end) as Nawanshahar_est_trng,
+	sum(case when district ='Patiala'  and target is not null then target else 0 end) as Patiala_est_trng,
+	sum(case when district ='Ropar'  and target is not null then target else 0 end) as Ropar_est_trng,
+	sum(case when district ='Sangrur'  and target is not null then target else 0 end) as Sangrur_est_trng,
+	sum(case when district ='SAS Nagar' and target is not null then target else 0 end) as SASNagar_est_trng,
+	sum(case when district ='Tarntaran'  and target is not null then target else 0 end) as Tarntaran_est_trng,
+	--sum(case when district ='SAS Nagar'  and target is not null then target else 0 end) as spmc,
+	sum(target) total_trng,
+	prwss_main.get_fin_year_code($P{fincode}) as finyear
+from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name as  district,training_name,training_id,
+	sum(target) target,sum(cnt_up_to_pre) cnt_up_to_pre,sum(cnt_during) cnt_during,sum(total_achive) total_achive
+from
+(select x.location_id,x.training_id,training_name,target,
+	case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end as cnt_up_to_pre,
+	case when cnt_during is null then 0 else cnt_during end as cnt_during,
+	(case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end)+
+	(case when cnt_during is null then 0 else cnt_during end) as total_achive
+from
+-----------------------------------Tgt--------------------------------------------------------
+(select td.location_id,pm.plan_id,td.training_id,training_name,count as target
+from prwss_main.t_wing_training_plan_detail td,prwss_main.mst_training mt,prwss_main.t_wing_training_plan_master pm
+where td.training_id=mt.training_id
+and   td.plan_id=pm.plan_id
+and   from_date >=prwss_main.get_fin_year_start_date($P{fincode}) and to_date<=prwss_main.get_fin_year_end_date($P{fincode})
+and   td.status<>'D' and mt.status<>'D' and pm.status<>'D' and mt.training_type='CCDUCBT' and   mt.status<>'D')x
+left join
+----------------------------------up_to_previous-------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_up_to_pre
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training >=prwss_main.get_fin_year_start_date($P{fincode})
+and   date_of_training < prwss_main.get_month_fin_year_start_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xx
+on x.training_id=xx.training_id
+and x.location_id=xx.location_id
+
+left join
+--------------------------------during_current-----------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_during
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training between prwss_main.get_month_fin_year_start_date('03',$P{fincode}) and prwss_main.get_month_fin_year_end_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xxx
+on x.training_id=xxx.training_id
+and x.location_id=xxx.location_id) main,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where main.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+group by  z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district,training_id,training_name
+order by district_name,training_name)xyz
+group by training_id,training_name
+
+union
+
+select  training_id,training_name,'upto '||to_char(date (date_trunc('month',(date(prwss_main.get_month_fin_year_end_date('03',$P{fincode})) - interval '1 month'))),'yyyy-month') as ordr,2 seq,
+	sum(case when district ='Amritsar' and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Amritsar_est_trng,
+	sum(case when district ='Barnala'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Barnala_est_trng,
+	sum(case when district ='Bathinda'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Bathinda_est_trng,
+	sum(case when district ='Faridkot'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Faridkot_est_trng,
+	sum(case when district ='Fatehgarh Sahib'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as FatehgarhSahib_est_trng,
+	sum(case when district ='Ferozepur'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Ferozepur_est_trng,
+	sum(case when district ='Gurdaspur'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Gurdaspur_est_trng,
+	sum(case when district ='Hoshiarpur'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Hoshiarpur_est_trng,
+	sum(case when district ='Jalandhar'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Jalandhar_est_trng,
+	sum(case when district ='Kapurthala'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Kapurthala_est_trng,
+	sum(case when district ='Ludhiana'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Ludhiana_est_trng,
+	sum(case when district ='Mansa'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Mansa_est_trng,
+	sum(case when district ='Moga'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Moga_est_trng,
+	sum(case when district ='Muktsar'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Muktsar_est_trng,
+	sum(case when district ='Nawanshahar'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Nawanshahar_est_trng,
+	sum(case when district ='Patiala'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Patiala_est_trng,
+	sum(case when district ='Ropar'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Ropar_est_trng,
+	sum(case when district ='Sangrur'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Sangrur_est_trng,
+	sum(case when district ='SAS Nagar' and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as SASNagar_est_trng,
+	sum(case when district ='Tarntaran'  and cnt_up_to_pre is not null then cnt_up_to_pre else 0 end) as Tarntaran_est_trng,
+	--sum(case when district ='SAS Nagar'  and target is not null then target else 0 end) as spmc,
+	sum(cnt_up_to_pre) total_trng,
+	prwss_main.get_fin_year_code($P{fincode}) as finyear
+from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name as  district,training_id,training_name,
+	sum(target) target,sum(cnt_up_to_pre) cnt_up_to_pre,sum(cnt_during) cnt_during,sum(total_achive) total_achive
+from
+(select x.location_id,x.training_id,training_name,target,
+	case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end as cnt_up_to_pre,
+	case when cnt_during is null then 0 else cnt_during end as cnt_during,
+	(case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end)+
+	(case when cnt_during is null then 0 else cnt_during end) as total_achive
+from
+-----------------------------------Tgt--------------------------------------------------------
+(select td.location_id,pm.plan_id,td.training_id,training_name,count as target
+from prwss_main.t_wing_training_plan_detail td,prwss_main.mst_training mt,prwss_main.t_wing_training_plan_master pm
+where td.training_id=mt.training_id
+and   td.plan_id=pm.plan_id
+and   from_date >=prwss_main.get_fin_year_start_date($P{fincode}) and to_date<=prwss_main.get_fin_year_end_date($P{fincode})
+and   td.status<>'D' and mt.status<>'D' and pm.status<>'D' and mt.training_type='CCDUCBT' and   mt.status<>'D')x
+left join
+----------------------------------up_to_previous-------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_up_to_pre
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training >=prwss_main.get_fin_year_start_date($P{fincode})
+and   date_of_training < prwss_main.get_month_fin_year_start_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xx
+on x.training_id=xx.training_id
+and x.location_id=xx.location_id
+
+left join
+--------------------------------during_current-----------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_during
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training between prwss_main.get_month_fin_year_start_date('03',$P{fincode}) and prwss_main.get_month_fin_year_end_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xxx
+on x.training_id=xxx.training_id
+and x.location_id=xxx.location_id) main,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where main.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+group by  z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district,training_id,training_name
+order by district_name,training_name)xyz
+group by training_id,training_name
+order by training_name)a
+
+union
+
+select  training_id,training_name,'during '||to_char(date (prwss_main.get_month_fin_year_end_date('03',$P{fincode})),'yyyy-month') as ordr,3 seq,
+	sum(case when district ='Amritsar' and cnt_during is not null then cnt_during else 0 end) as Amritsar_est_trng,
+	sum(case when district ='Barnala'  and cnt_during is not null then cnt_during else 0 end) as Barnala_est_trng,
+	sum(case when district ='Bathinda'  and cnt_during is not null then cnt_during else 0 end) as Bathinda_est_trng,
+	sum(case when district ='Faridkot'  and cnt_during is not null then cnt_during else 0 end) as Faridkot_est_trng,
+	sum(case when district ='Fatehgarh Sahib'  and cnt_during is not null then cnt_during else 0 end) as FatehgarhSahib_est_trng,
+	sum(case when district ='Ferozepur'  and cnt_during is not null then cnt_during else 0 end) as Ferozepur_est_trng,
+	sum(case when district ='Gurdaspur'  and cnt_during is not null then cnt_during else 0 end) as Gurdaspur_est_trng,
+	sum(case when district ='Hoshiarpur'  and cnt_during is not null then cnt_during else 0 end) as Hoshiarpur_est_trng,
+	sum(case when district ='Jalandhar'  and cnt_during is not null then cnt_during else 0 end) as Jalandhar_est_trng,
+	sum(case when district ='Kapurthala'  and cnt_during is not null then cnt_during else 0 end) as Kapurthala_est_trng,
+	sum(case when district ='Ludhiana'  and cnt_during is not null then cnt_during else 0 end) as Ludhiana_est_trng,
+	sum(case when district ='Mansa'  and cnt_during is not null then cnt_during else 0 end) as Mansa_est_trng,
+	sum(case when district ='Moga'  and cnt_during is not null then cnt_during else 0 end) as Moga_est_trng,
+	sum(case when district ='Muktsar'  and cnt_during is not null then cnt_during else 0 end) as Muktsar_est_trng,
+	sum(case when district ='Nawanshahar'  and cnt_during is not null then cnt_during else 0 end) as Nawanshahar_est_trng,
+	sum(case when district ='Patiala'  and cnt_during is not null then cnt_during else 0 end) as Patiala_est_trng,
+	sum(case when district ='Ropar'  and cnt_during is not null then cnt_during else 0 end) as Ropar_est_trng,
+	sum(case when district ='Sangrur'  and cnt_during is not null then cnt_during else 0 end) as Sangrur_est_trng,
+	sum(case when district ='SAS Nagar' and cnt_during is not null then cnt_during else 0 end) as SASNagar_est_trng,
+	sum(case when district ='Tarntaran'  and cnt_during is not null then cnt_during else 0 end) as Tarntaran_est_trng,
+	--sum(case when district ='SAS Nagar'  and target is not null then target else 0 end) as spmc,
+	sum(cnt_during) total_trng,
+	prwss_main.get_fin_year_code($P{fincode}) as finyear
+from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name as  district,training_id,training_name,
+	sum(target) target,sum(cnt_up_to_pre) cnt_up_to_pre,sum(cnt_during) cnt_during,sum(total_achive) total_achive
+from
+(select x.location_id,x.training_id,training_name,target,
+	case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end as cnt_up_to_pre,
+	case when cnt_during is null then 0 else cnt_during end as cnt_during,
+	(case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end)+
+	(case when cnt_during is null then 0 else cnt_during end) as total_achive
+from
+-----------------------------------Tgt--------------------------------------------------------
+(select td.location_id,pm.plan_id,td.training_id,training_name,count as target
+from prwss_main.t_wing_training_plan_detail td,prwss_main.mst_training mt,prwss_main.t_wing_training_plan_master pm
+where td.training_id=mt.training_id
+and   td.plan_id=pm.plan_id
+and   from_date >=prwss_main.get_fin_year_start_date($P{fincode}) and to_date<=prwss_main.get_fin_year_end_date($P{fincode})
+and   td.status<>'D' and mt.status<>'D' and pm.status<>'D' and mt.training_type='CCDUCBT' and   mt.status<>'D')x
+left join
+----------------------------------up_to_previous-------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_up_to_pre
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training >=prwss_main.get_fin_year_start_date($P{fincode})
+and   date_of_training < prwss_main.get_month_fin_year_start_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xx
+on x.training_id=xx.training_id
+and x.location_id=xx.location_id
+
+left join
+--------------------------------during_current-----------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_during
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training between prwss_main.get_month_fin_year_start_date('03',$P{fincode}) and prwss_main.get_month_fin_year_end_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xxx
+on x.training_id=xxx.training_id
+and x.location_id=xxx.location_id) main,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where main.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+group by  z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district,training_id,training_name
+order by district_name,training_name)xyz
+group by training_id,training_name
+order by training_name,seq)b
+
+union
+
+select  training_id,training_name,'Up to '||to_char(date (prwss_main.get_month_fin_year_end_date('03',$P{fincode})),'yyyy-month') as ordr,4 as seq,
+	sum(case when district ='Amritsar' and  total_achive is not null then total_achive else 0 end) as Amritsar_est_trng,
+	sum(case when district ='Barnala'  and  total_achive is not null then total_achive else 0 end) as Barnala_est_trng,
+	sum(case when district ='Bathinda'  and  total_achive is not null then total_achive else 0 end) as Bathinda_est_trng,
+	sum(case when district ='Faridkot'  and  total_achive is not null then total_achive else 0 end) as Faridkot_est_trng,
+	sum(case when district ='Fatehgarh Sahib'  and  total_achive is not null then total_achive else 0 end) as FatehgarhSahib_est_trng,
+	sum(case when district ='Ferozepur'  and  total_achive is not null then total_achive else 0 end) as Ferozepur_est_trng,
+	sum(case when district ='Gurdaspur'  and  total_achive is not null then total_achive else 0 end) as Gurdaspur_est_trng,
+	sum(case when district ='Hoshiarpur'  and  total_achive is not null then total_achive else 0 end) as Hoshiarpur_est_trng,
+	sum(case when district ='Jalandhar'  and  total_achive is not null then total_achive else 0 end) as Jalandhar_est_trng,
+	sum(case when district ='Kapurthala'  and  total_achive is not null then total_achive else 0 end) as Kapurthala_est_trng,
+	sum(case when district ='Ludhiana'  and  total_achive is not null then total_achive else 0 end) as Ludhiana_est_trng,
+	sum(case when district ='Mansa'  and  total_achive is not null then total_achive else 0 end) as Mansa_est_trng,
+	sum(case when district ='Moga'  and  total_achive is not null then total_achive else 0 end) as Moga_est_trng,
+	sum(case when district ='Muktsar'  and  total_achive is not null then total_achive else 0 end) as Muktsar_est_trng,
+	sum(case when district ='Nawanshahar'  and  total_achive is not null then total_achive else 0 end) as Nawanshahar_est_trng,
+	sum(case when district ='Patiala'  and  total_achive is not null then total_achive else 0 end) as Patiala_est_trng,
+	sum(case when district ='Ropar'  and  total_achive is not null then total_achive else 0 end) as Ropar_est_trng,
+	sum(case when district ='Sangrur'  and  total_achive is not null then total_achive else 0 end) as Sangrur_est_trng,
+	sum(case when district ='SAS Nagar' and  total_achive is not null then total_achive else 0 end) as SASNagar_est_trng,
+	sum(case when district ='Tarntaran'  and  total_achive is not null then total_achive else 0 end) as Tarntaran_est_trng,
+	--sum(case when district ='SAS Nagar'  and target is not null then target else 0 end) as spmc,
+	sum(total_achive) total_trng,
+	prwss_main.get_fin_year_code($P{fincode}) as finyear
+from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name as  district,training_id,training_name,
+	sum(target) target,sum(cnt_up_to_pre) cnt_up_to_pre,sum(cnt_during) cnt_during,sum(total_achive) total_achive
+from
+(select x.location_id,x.training_id,training_name,target,
+	case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end as cnt_up_to_pre,
+	case when cnt_during is null then 0 else cnt_during end as cnt_during,
+	(case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end)+
+	(case when cnt_during is null then 0 else cnt_during end) as total_achive
+from
+-----------------------------------Tgt--------------------------------------------------------
+(select td.location_id,pm.plan_id,td.training_id,training_name,count as target
+from prwss_main.t_wing_training_plan_detail td,prwss_main.mst_training mt,prwss_main.t_wing_training_plan_master pm
+where td.training_id=mt.training_id
+and   td.plan_id=pm.plan_id
+and   from_date >=prwss_main.get_fin_year_start_date($P{fincode}) and to_date<=prwss_main.get_fin_year_end_date($P{fincode})
+and   td.status<>'D' and mt.status<>'D' and pm.status<>'D' and mt.training_type='CCDUCBT' and   mt.status<>'D')x
+left join
+----------------------------------up_to_previous-------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_up_to_pre
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training >=prwss_main.get_fin_year_start_date($P{fincode})
+and   date_of_training < prwss_main.get_month_fin_year_start_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xx
+on x.training_id=xx.training_id
+and x.location_id=xx.location_id
+
+left join
+--------------------------------during_current-----------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_during
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training between prwss_main.get_month_fin_year_start_date('03',$P{fincode}) and prwss_main.get_month_fin_year_end_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xxx
+on x.training_id=xxx.training_id
+and x.location_id=xxx.location_id) main,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where main.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+group by  z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district,training_id,training_name
+order by district_name,training_name)xyz
+group by training_id,training_name
+order by training_name,seq)c
+
+union
+
+select  training_id,training_name,'Percentage'as ordr,5 as seq,
+	sum(case when district ='Amritsar' and  percentage is not null then percentage else 0 end) as Amritsar_est_trng,
+	sum(case when district ='Barnala'  and  percentage is not null then percentage else 0 end) as Barnala_est_trng,
+	sum(case when district ='Bathinda'  and  percentage is not null then percentage else 0 end) as Bathinda_est_trng,
+	sum(case when district ='Faridkot'  and  percentage is not null then percentage else 0 end) as Faridkot_est_trng,
+	sum(case when district ='Fatehgarh Sahib'  and  percentage is not null then percentage else 0 end) as FatehgarhSahib_est_trng,
+	sum(case when district ='Ferozepur'  and  percentage is not null then percentage else 0 end) as Ferozepur_est_trng,
+	sum(case when district ='Gurdaspur'  and  percentage is not null then percentage else 0 end) as Gurdaspur_est_trng,
+	sum(case when district ='Hoshiarpur'  and  percentage is not null then percentage else 0 end) as Hoshiarpur_est_trng,
+	sum(case when district ='Jalandhar'  and  percentage is not null then percentage else 0 end) as Jalandhar_est_trng,
+	sum(case when district ='Kapurthala'  and  percentage is not null then percentage else 0 end) as Kapurthala_est_trng,
+	sum(case when district ='Ludhiana'  and  percentage is not null then percentage else 0 end) as Ludhiana_est_trng,
+	sum(case when district ='Mansa'  and  percentage is not null then percentage else 0 end) as Mansa_est_trng,
+	sum(case when district ='Moga'  and  percentage is not null then percentage else 0 end) as Moga_est_trng,
+	sum(case when district ='Muktsar'  and  percentage is not null then percentage else 0 end) as Muktsar_est_trng,
+	sum(case when district ='Nawanshahar'  and  percentage is not null then percentage else 0 end) as Nawanshahar_est_trng,
+	sum(case when district ='Patiala'  and  percentage is not null then percentage else 0 end) as Patiala_est_trng,
+	sum(case when district ='Ropar'  and  percentage is not null then percentage else 0 end) as Ropar_est_trng,
+	sum(case when district ='Sangrur'  and  percentage is not null then percentage else 0 end) as Sangrur_est_trng,
+	sum(case when district ='SAS Nagar' and  percentage is not null then percentage else 0 end) as SASNagar_est_trng,
+	sum(case when district ='Tarntaran'  and  percentage is not null then percentage else 0 end) as Tarntaran_est_trng,
+	--sum(case when district ='SAS Nagar'  and target is not null then target else 0 end) as spmc,
+	sum(percentage) total_trng,
+	prwss_main.get_fin_year_code($P{fincode}) as finyear
+from
+(select z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district_name as  district,training_id,training_name,
+	sum(target) target,sum(cnt_up_to_pre) cnt_up_to_pre,sum(cnt_during) cnt_during,sum(total_achive) total_achive,
+	round((case when sum(target)=0 then 0 else sum(total_achive)*100/sum(target) end),2) as percentage
+from
+(select x.location_id,x.training_id,training_name,target,
+	case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end as cnt_up_to_pre,
+	case when cnt_during is null then 0 else cnt_during end as cnt_during,
+	(case when cnt_up_to_pre is null then 0 else cnt_up_to_pre end)+
+	(case when cnt_during is null then 0 else cnt_during end) as total_achive
+from
+-----------------------------------Tgt--------------------------------------------------------
+(select td.location_id,pm.plan_id,td.training_id,training_name,count as target
+from prwss_main.t_wing_training_plan_detail td,prwss_main.mst_training mt,prwss_main.t_wing_training_plan_master pm
+where td.training_id=mt.training_id
+and   td.plan_id=pm.plan_id
+and   from_date >=prwss_main.get_fin_year_start_date($P{fincode}) and to_date<=prwss_main.get_fin_year_end_date($P{fincode})
+and   td.status<>'D' and mt.status<>'D' and pm.status<>'D' and mt.training_type='CCDUCBT' and   mt.status<>'D')x
+left join
+----------------------------------up_to_previous-------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_up_to_pre
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training >=prwss_main.get_fin_year_start_date($P{fincode})
+and   date_of_training < prwss_main.get_month_fin_year_start_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xx
+on x.training_id=xx.training_id
+and x.location_id=xx.location_id
+
+left join
+--------------------------------during_current-----------------------------------------------------------
+
+(select plan_id,location_id,training_id,count(training_id) as cnt_during
+from prwss_main.t_ccdu_cb_training_progress
+where date_of_training between prwss_main.get_month_fin_year_start_date('03',$P{fincode}) and prwss_main.get_month_fin_year_end_date('03',$P{fincode})
+group by training_id,location_id,plan_id)xxx
+on x.training_id=xxx.training_id
+and x.location_id=xxx.location_id) main,prwss_main.mst_divisional di,prwss_main.mst_district d,prwss_main.mst_circle c,prwss_main.mst_zone z
+where main.location_id=di.divisional_id
+and   di.district_id=d.district_id
+and   d.circle_id=c.circle_id
+and   c.zone_id=z.zone_id
+group by  z.zone_id,zone_name,c.circle_id,circle_name,d.district_id,district,training_id,training_id,training_id,training_name
+order by district_name,training_name)xyz
+group by training_id,training_name
+order by training_id,seq]]>
+	</queryString>
+	<field name="training_id" class="java.lang.String"/>
+	<field name="training_name" class="java.lang.String"/>
+	<field name="ordr" class="java.lang.String"/>
+	<field name="seq" class="java.lang.Integer"/>
+	<field name="amritsar_est_trng" class="java.math.BigDecimal"/>
+	<field name="barnala_est_trng" class="java.math.BigDecimal"/>
+	<field name="bathinda_est_trng" class="java.math.BigDecimal"/>
+	<field name="faridkot_est_trng" class="java.math.BigDecimal"/>
+	<field name="fatehgarhsahib_est_trng" class="java.math.BigDecimal"/>
+	<field name="ferozepur_est_trng" class="java.math.BigDecimal"/>
+	<field name="gurdaspur_est_trng" class="java.math.BigDecimal"/>
+	<field name="hoshiarpur_est_trng" class="java.math.BigDecimal"/>
+	<field name="jalandhar_est_trng" class="java.math.BigDecimal"/>
+	<field name="kapurthala_est_trng" class="java.math.BigDecimal"/>
+	<field name="ludhiana_est_trng" class="java.math.BigDecimal"/>
+	<field name="mansa_est_trng" class="java.math.BigDecimal"/>
+	<field name="moga_est_trng" class="java.math.BigDecimal"/>
+	<field name="muktsar_est_trng" class="java.math.BigDecimal"/>
+	<field name="nawanshahar_est_trng" class="java.math.BigDecimal"/>
+	<field name="patiala_est_trng" class="java.math.BigDecimal"/>
+	<field name="ropar_est_trng" class="java.math.BigDecimal"/>
+	<field name="sangrur_est_trng" class="java.math.BigDecimal"/>
+	<field name="sasnagar_est_trng" class="java.math.BigDecimal"/>
+	<field name="tarntaran_est_trng" class="java.math.BigDecimal"/>
+	<field name="total_trng" class="java.math.BigDecimal"/>
+	<field name="finyear" class="java.lang.String"/>
+	<variable name="amritsar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amritsar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="barnala_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{barnala_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="bathinda_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{bathinda_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="faridkot_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{faridkot_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="fatehgarhsahib_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{fatehgarhsahib_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="ferozepur_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ferozepur_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="gurdaspur_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gurdaspur_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="hoshiarpur_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{hoshiarpur_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="jalandhar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{jalandhar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="kapurthala_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{kapurthala_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="ludhiana_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ludhiana_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="mansa_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{mansa_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="moga_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{moga_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="muktsar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{muktsar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="sasnagar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{sasnagar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="nawanshahar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{nawanshahar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="patiala_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{patiala_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="ropar_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{ropar_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="sangrur_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{sangrur_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="tarntaran_est_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tarntaran_est_trng}]]></variableExpression>
+	</variable>
+	<variable name="total_trng_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_trng}]]></variableExpression>
+	</variable>
+	<variable name="total_trng_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_trng}]]></variableExpression>
+	</variable>
+	<variable name="nawanshahar_est_trng_2" class="java.math.BigDecimal" resetType="Group" resetGroup="trng_name" calculation="Sum">
+		<variableExpression><![CDATA[$F{nawanshahar_est_trng}]]></variableExpression>
+	</variable>
+	<group name="trng_name">
+		<groupExpression><![CDATA[$F{training_name}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField pattern="" isBlankWhenNull="true">
+					<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="825" height="20" forecolor="#000000" backcolor="#CCFFFF"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+						<font fontName="SansSerif" size="10" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{training_name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="66" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="44" width="392" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status of Capacity Building Activities (Target Vs Achievement)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="707" y="21" width="111" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CCDU Report: 8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="228" y="21" width="389" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[Website: www.pbdwss.gov.in]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="825" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Department   of   Water   Supply   &   Sanitation, Punjab]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="451" y="44" width="100" height="20"/>
+				<box leftPadding="4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{finyear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="744" y="44" width="79" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="645" y="44" width="99" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[As on :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="409" y="44" width="42" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F.Y.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="117" splitType="Stretch">
+			<staticText>
+				<reportElement style="table_TH" x="0" y="0" width="25" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sr.No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="185" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amritsar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="25" y="0" width="160" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Target/Achievement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="25" y="102" width="160" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="0" y="102" width="25" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="185" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="217" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[4]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="217" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Barnala]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="249" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="249" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bathinda]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="281" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="281" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Faridkot]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="313" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="313" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F.Sahib]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="345" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="345" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ferozepur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="377" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[9]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="441" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Jalandhar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="473" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="473" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kapurthala]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="601" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[16]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="409" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hoshiarpur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="569" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="409" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="537" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mansa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="601" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mohali]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="441" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[11]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="537" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="569" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Moga]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="505" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[13]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="505" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ludhiana]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="729" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="633" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[17]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="697" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[19]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="665" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[18]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="761" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sangrur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="793" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[22]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="633" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Muktsar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="697" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patiala]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="793" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tarantaran]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="761" y="102" width="32" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[21]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="729" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ropar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="665" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nawan Shehar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table_TH" x="377" y="0" width="32" height="102" backcolor="#CACCFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Gurdaspur]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="#,##0.00;#,##0.00-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="25" y="0" width="160" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ordr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="185" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{amritsar_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-">
+				<reportElement style="table_TD" mode="Opaque" x="0" y="0" width="25" height="20" forecolor="#000000" backcolor="#F0F8FF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="217" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{barnala_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="249" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{bathinda_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="281" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{faridkot_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="313" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fatehgarhsahib_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="345" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ferozepur_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="377" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gurdaspur_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="409" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{hoshiarpur_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="441" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{jalandhar_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="473" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{kapurthala_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="505" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ludhiana_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="537" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{mansa_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="569" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{moga_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="601" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sasnagar_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="633" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{muktsar_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="697" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{patiala_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="729" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ropar_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="761" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{sangrur_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="793" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{tarntaran_est_trng}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0;###0-" isBlankWhenNull="true">
+				<reportElement style="table_TD" mode="Opaque" x="665" y="0" width="32" height="20" forecolor="#000000" backcolor="#FFFFCC"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{nawanshahar_est_trng}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
