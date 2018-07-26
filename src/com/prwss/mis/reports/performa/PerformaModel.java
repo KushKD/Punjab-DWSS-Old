@@ -1,0 +1,143 @@
+package com.prwss.mis.reports.performa;
+
+public class PerformaModel {
+
+	
+	private String village_id ;
+	private String village_name ;	
+	private String scheme_id ;
+	private int Hadbast_No;
+	private int No_of_habitations ;
+	private String Name_of_habitations ;	
+	private String Type_of_Habitations ;
+	private String Assembly_Constituency ;	
+	private int Total_Population ;	
+	private int SC_Population ;
+	private int Total_Households ;	
+	private int SC_Households ;	
+	private int Panchayat_Ghar ;	
+	private int Community_Centre_or_Dharamshala ;
+	private int Angarwaries ;	
+	private int no_of_Angarwaries ;	
+	private String Angarwaries_buildings_Type ;	
+	private int Govt_Schools ;
+	private int no_of_Govt_Schools ;	
+	private int Health_Centre ;
+	private int No_of_Health_Centres	;	
+	private int Village_Ponds	;
+	private int no_of_Village_Ponds ;	
+	private int Area_in_Square_meters ;
+	private String scheme_source ;	
+	private String scheme_type ;	
+	private String Date_of_commissioning ;
+	private String Prog_id ;	
+	private String Service_level ;	
+	private String scheme_upgraded ;
+	private int scheme_expenditure ;	
+	private int Depth_of_Tubewell ;	
+	private int Size_of_Tubewell ;
+	private int Year_of_Drilling ;
+	private int Original_discharge_at_time_of_commissioning ;	
+	private int Present_Discharge ;	
+	private int Present_Spring_Level ;
+	private String installation_of_new_machinery ;	
+	private int Capacity_of_machinery  ;	
+	private String Inlet_channel_Type ;
+	private int Inlet_channel_Lenght ;	
+	private String Pipe_type ;	
+	private int Capacity_of_SS_tank ;	
+	private int Capacity_of_HL_tank ;
+	private int Capacity_of_CW_tank ;	
+	private String Filtertion_type ;	
+	private int Filtertion_No ;
+	private int Filtertion_Capacity ;
+	private int Capacity_of_Raw_water ;	
+	private int Capacity_of_Clear_water ;
+	private int No_of_ohsr ;	
+	private String OHSR_construction_date ;	
+	private int OHSR_Capcity ;	
+	private int OHSR_working_Condition ;
+	private String OHSR_working_Condition_if_No ;
+	private int Pipeline_AC ;	
+	private int Pipeline_MS_DI_Ci ;
+	private int Pipeline_GI ;	
+	private int Pipeline_PVC ;
+	private int Functional_Distribution_percentage ;	
+	private String Disinfection_type ;
+	private String Disinfection_Instalation_time ;
+	private String Disinfection_Present_status ;	
+	private String Scheme_operated_by ;
+	private int Sanctioned_Load ;	
+	private int Pending__bill_31032017 ;	
+	private int Pending__bill_30062017 ;
+	private int Avg_month_billof_WSS ;	
+	private int Household_water_connection ;	
+	private int Watered_connection ;	
+	private int Metered_connection ;
+	private String  Metered_supply_recovery ;	
+	private int Flat_rate_charges_per_month ;	
+	private int Arrear_of_recovery_with_consumers_as01042017 ;
+	private int Scheme_Functional ;	
+	private String scheme_NonFunctional ;	
+	private String scheme_NonFunctional_date ;	
+	private int Ground_water_potable_status ;
+	private String Ground_water_potable_No ;	
+	private String Preventive_measures_adopted ;		
+	private int Capacity_of_plant ;
+	private String Date_of_installation ;
+	private String Being_operated_by  ;
+	private int Volume_of_Water_Daily_basis ;
+	private String disposal_of_reject_water ;
+	private int Penetration_in_percentage ;	
+	private int Present_rate_of_user_charges ;	
+	private int Seperate_Sanctioned_Load ;	
+	private int Seperate_Pending_eletric_bill31032017	 ;
+	private int Average_monthly_bill_of_Treatment_plant ;
+	private int Independent_New_WSS ;	
+	private int Independent_New_WSS_cost ;	
+	private int Upgradation_of_existing_WSS ;
+	private int Upgradation_of_existing_WSS_cost ;	
+	private int Instltion_Wtr_Treatment_plant ;
+	private int Instltion_Wtr_Treatment_plant_cost ; 
+	private String Source_of_WSS ;
+	private String shifted_to_canal_from_Other ;
+	private int Driling_of_new_tubewell_machinery_size ;	
+	private int Driling_of_new_tubewell_machinery_depth ;	
+	private int Driling_of_new_tubewell_machinery_capacity ;
+	private int Driling_of_new_tubewell_machinery_cost ;	
+	private int canal_based_Inlet_channel_Size_of_pipe ;	
+	private int canal_based_Inlet_channel_length ;
+	private int canal_based_s_and_s_Capacity ;	
+	private String canal_based_Filteration_Plan_type ;	
+	private int canal_based_Filteration_Plan_capacity ;
+	private int canal_based_Cost ;	
+	private int OHSR_Capacity ;	
+	private int OHSR_Full_Supply_Level ;	
+	private int OHSR_Cost ;	
+	private String Other_structures_at_waterworks ;	
+	private int Other_structures_at_waterworks_Cost ;	
+	private String Distribution_WSS_to_village_type ;
+	private int Distribution_WSS_to_village_length ;	
+	private String Distribution_WSS_within_village_type ;	
+	private int Distribution_WSS_within_village_length ;
+	private int Distribution_Cost ;	
+	private int No_of_connections_100_mtr ;	 
+	private int No_of_mtrs_100_mtr ;	
+	private int Cost_100_mtr ;
+	private String Disinfection_Unit_Type ;	
+	private int Disinfection_Unit_Cost ;	
+	private String Water_Treatment_plant_in_case_of_quality_village_type ;
+	private int Water_Treatment_plant_in_case_of_quality_village_capacity ;	
+	private int Water_Treatment_plant_in_case_of_quality_village_Cost ;
+	private int Bulk_Water_meter_no ;	
+	private int Bulk_Water_meter_cost ;	
+	private int Extension_Sanction_of_new_electric_connection_cost ;
+	
+	
+	
+	
+	
+
+	
+	
+}
